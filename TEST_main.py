@@ -130,7 +130,7 @@ if __name__ == "__main__":
                                                                                                                                                                                              test_input_len, max_str_len, device)
     print("Test successfully applied.")
     print(f"--> Accuracy of the model on the {test_size} test images: {test_accuracy_words_LSTM:%}")
-    print(f"--> Accuracy of the model on the {n_letters} test letters: {test_accuracy_letters_LSTM:%}")
+    print(f"--> Accuracy of the model on the {n_letters_LSTM} test letters: {test_accuracy_letters_LSTM:%}")
     print(f"--> Average word's proportion well predicted on mispredicted words : {mispred_prop_letters_LSTM:%}")
     plot_misclassified(mispred_images_LSTM, mispred_pred_LSTM, mispred_target_LSTM, alphabet)
     
@@ -140,7 +140,7 @@ if __name__ == "__main__":
                                                                                                                                                                                              test_input_len, max_str_len, device)
     print("Test successfully applied.")
     print(f"--> Accuracy of the model on the {test_size} test images: {test_accuracy_words_GRU:%}")
-    print(f"--> Accuracy of the model on the {n_letters} test letters: {test_accuracy_letters_GRU:%}")
+    print(f"--> Accuracy of the model on the {n_letters_GRU} test letters: {test_accuracy_letters_GRU:%}")
     print(f"--> Average word's proportion well predicted on mispredicted words : {mispred_prop_letters_GRU:%}")
     plot_misclassified(mispred_images_GRU, mispred_pred_GRU, mispred_target_GRU, alphabet)
     
