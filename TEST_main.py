@@ -88,45 +88,80 @@ if __name__ == "__main__":
     # Loss function
     criterion = torch.nn.CTCLoss()
     # Initialisation of the model
-    model = CRNN(rnn_input_dim, rnn_hidden_dim, n_rnn_layers, output_dim, drop_prob, "GRU").to(device)
+    model_LSTM = CRNN(rnn_input_dim, rnn_hidden_dim, n_rnn_layers, output_dim, drop_prob).to(device)
+    model_GRU = CRNN(rnn_input_dim, rnn_hidden_dim, n_rnn_layers, output_dim, drop_prob, "GRU").to(device)
     # Optimizer
-    optimizer = optim.Adam(model.parameters(), lr=0.001, weight_decay=0.001)
-    print("Model successfully created.")
-    print(f"--> Number of parameters : {get_n_params(model)}")
-    model.to(device)
+    optimizer_LSTM = optim.Adam(model_LSTM.parameters(), lr=0.001, weight_decay=0.001)
+    optimizer_GRU = optim.Adam(model_GRU.parameters(), lr=0.001, weight_decay=0.001)
+    print("Models successfully created.")
+    print(f"--> LSTM : {get_n_params(model_LSTM)} parameters")
+    print(f"--> GRU : {get_n_params(model_GRU)} parameters")
+    
+    model_LSTM.to(device)
+    model_GRU.to(device)
     
     ###########################################################################
     ############################# CRNN TRAINING ###############################
     ###########################################################################
-    print("CRNN Training...")
     num_epochs = 3
-    
-    train_loss, valid_loss, words_acc_val, letters_acc_val = train_CRNN(train_loader, model, batch_size, 
-                                                                        criterion, optimizer, num_epochs, valid_loader, 
+    print("LSTM Training...")
+    train_loss_LSTM, valid_loss_LSTM, words_acc_val_LSTM, letters_acc_val_LSTM = train_CRNN(train_loader, model_LSTM, batch_size, 
+                                                                        criterion, optimizer_LSTM, num_epochs, valid_loader, 
                                                                         train_label_len, train_input_len, valid_label_len, 
                                                                         valid_input_len, max_str_len, device)
                                                                        
-    visualize_results(train_loss,valid_loss,words_acc_val,letters_acc_val)
+    visualize_results(train_loss_LSTM,valid_loss_LSTM,words_acc_val_LSTM,letters_acc_val_LSTM)
+    print("Training successfully completed.")
+    
+    print("GRU Training...")
+    train_loss_GRU, valid_loss_GRU, words_acc_val_GRU, letters_acc_val_GRU = train_CRNN(train_loader, model_GRU, batch_size, 
+                                                                        criterion, optimizer_GRU, num_epochs, valid_loader, 
+                                                                        train_label_len, train_input_len, valid_label_len, 
+                                                                        valid_input_len, max_str_len, device)
+                                                                       
+    visualize_results(train_loss_GRU,valid_loss_GRU,words_acc_val_GRU,letters_acc_val_GRU)
     print("Training successfully completed.")
     ###########################################################################
     ############################### CRNN TEST #################################
     ###########################################################################
-    print("CRNN Test...")
-    test_loss, test_accuracy_words, test_accuracy_letters, n_letters, mispred_prop_letters, mispred_images, mispred_pred,mispred_target = test_CRNN(criterion, model, test_loader, batch_size, test_label_len, test_input_len, max_str_len, device)
+    print("LSTM Test...")
+    test_loss_LSTM, test_accuracy_words_LSTM, test_accuracy_letters_LSTM, n_letters_LSTM, mispred_prop_letters_LSTM, mispred_images_LSTM, mispred_pred_LSTM ,mispred_target_LSTM = test_CRNN(criterion, model_LSTM, test_loader, 
+                                                                                                                                                                                             batch_size, test_label_len, 
+                                                                                                                                                                                             test_input_len, max_str_len, device)
     print("Test successfully applied.")
-    print(f"--> Accuracy of the model on the {test_size} test images: {test_accuracy_words:%}")
-    print(f"--> Accuracy of the model on the {n_letters} test letters: {test_accuracy_letters:%}")
-    print(f"--> Average word's proportion well predicted on mispredicted words : {mispred_prop_letters:%}")
-    plot_misclassified(mispred_images, mispred_pred, mispred_target, alphabet)
+    print(f"--> Accuracy of the model on the {test_size} test images: {test_accuracy_words_LSTM:%}")
+    print(f"--> Accuracy of the model on the {n_letters} test letters: {test_accuracy_letters_LSTM:%}")
+    print(f"--> Average word's proportion well predicted on mispredicted words : {mispred_prop_letters_LSTM:%}")
+    plot_misclassified(mispred_images_LSTM, mispred_pred_LSTM, mispred_target_LSTM, alphabet)
+    
+    print("GRU Test...")
+    test_loss_GRU, test_accuracy_words_GRU, test_accuracy_letters_GRU, n_letters_GRU, mispred_prop_letters_GRU, mispred_images_GRU, mispred_pred_GRU ,mispred_target_GRU = test_CRNN(criterion, model_GRU, test_loader, 
+                                                                                                                                                                                             batch_size, test_label_len, 
+                                                                                                                                                                                             test_input_len, max_str_len, device)
+    print("Test successfully applied.")
+    print(f"--> Accuracy of the model on the {test_size} test images: {test_accuracy_words_GRU:%}")
+    print(f"--> Accuracy of the model on the {n_letters} test letters: {test_accuracy_letters_GRU:%}")
+    print(f"--> Average word's proportion well predicted on mispredicted words : {mispred_prop_letters_GRU:%}")
+    plot_misclassified(mispred_images_GRU, mispred_pred_GRU, mispred_target_GRU, alphabet)
     
     ###########################################################################
     ############################## OWN IMAGES #################################
     ###########################################################################
     path = '/home/xnmaster/github-classroom/DCC-UAB/deep-learning-project-2024-ai_nndl_group_14/IMAGES_EXTRA/'
-    pred_andreu = test_own_image(model,path+'name_trial_andreu.jpg',alphabet,max_str_len,device)
-    pred_mathias = test_own_image(model,path+'name_trial_mathias.jpg',alphabet,max_str_len,device)
-    pred_pere = test_own_image(model,path+'name_trial_pere.jpg',alphabet,max_str_len,device)
+    print("Testing our own images with LSTM...")
+    pred_andreu_LSTM = test_own_image(model_LSTM,path+'name_trial_andreu.jpg',alphabet,max_str_len,device)
+    pred_mathias_LSTM = test_own_image(model_LSTM,path+'name_trial_mathias.jpg',alphabet,max_str_len,device)
+    pred_pere_LSTM = test_own_image(model_LSTM,path+'name_trial_pere.jpg',alphabet,max_str_len,device)
     
-    print(f"ANDREU : predicted as {pred_andreu}")
-    print(f"MATHIAS : predicted as {pred_mathias}")
-    print(f"PERE : predicted as {pred_pere}")
+    print(f"ANDREU : predicted as {pred_andreu_LSTM}")
+    print(f"MATHIAS : predicted as {pred_mathias_LSTM}")
+    print(f"PERE : predicted as {pred_pere_LSTM}")
+    
+    print("Testing our own images with GRU...")
+    pred_andreu_GRU = test_own_image(model_GRU,path+'name_trial_andreu.jpg',alphabet,max_str_len,device)
+    pred_mathias_GRU = test_own_image(model_GRU,path+'name_trial_mathias.jpg',alphabet,max_str_len,device)
+    pred_pere_GRU = test_own_image(model_GRU,path+'name_trial_pere.jpg',alphabet,max_str_len,device)
+    
+    print(f"ANDREU : predicted as {pred_andreu_GRU}")
+    print(f"MATHIAS : predicted as {pred_mathias_GRU}")
+    print(f"PERE : predicted as {pred_pere_GRU}")
