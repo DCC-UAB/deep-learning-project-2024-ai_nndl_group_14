@@ -54,6 +54,7 @@ def validate_CRNN(criterion, model, loader, batch_size, valid_label_len, valid_i
     batch_size : Int - Size of a batch
     valid_label_len : torch.tensor - Real lengths of the labels
     valid_input_len : torch.tensor - Lengths of the outputs of the model
+    max_str_len : Int - maximum label length
     device : torch.device - GPU or CPU
 
     Returns

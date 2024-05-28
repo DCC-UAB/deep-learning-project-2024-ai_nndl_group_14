@@ -3,6 +3,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from TEST_train import decode
+from TEST_Data_Preprocessing import num_to_label, preprocess_image
+import cv2
 
 
 @torch.no_grad()  # prevent this function from computing gradients
@@ -18,6 +20,7 @@ def test_CRNN(criterion, model, loader, batch_size, test_label_len, test_input_l
     batch_size : Int - Size of a batch
     test_label_len : torch.tensor - Real lengths of the labels
     test_input_len : torch.tensor - Lengths of the outputs of the model
+    max_str_len : Int - maximum label length
     device : torch.device - GPU or CPU
 
     Returns
@@ -40,7 +43,6 @@ def test_CRNN(criterion, model, loader, batch_size, test_label_len, test_input_l
     
     mispred_prop_letters = 0
     mispred_nb_letters = 0
-    mispred_images = []
 
     # Gradients are not needed
     model.eval()
@@ -69,7 +71,7 @@ def test_CRNN(criterion, model, loader, batch_size, test_label_len, test_input_l
 
         # Computation of the accuracies
         _, pred = torch.max(output.data,dim=2)
-        pred = decode(pred,batch_size,24)
+        pred = decode(pred,batch_size,max_str_len)
 
         target = target.cpu().numpy()
 
@@ -78,7 +80,7 @@ def test_CRNN(criterion, model, loader, batch_size, test_label_len, test_input_l
         
         # We keep in memory the misclassified images
         mispred_index = np.sum((abs(target-pred)),axis=1)!=0
-        mispred_images.append(data[mispred_index,:,:,:])
+        mispred_images = data[mispred_index,:,:,:]
         
         mispred_pred = pred[mispred_index]
         mispred_target = target[mispred_index]
@@ -100,7 +102,7 @@ def test_CRNN(criterion, model, loader, batch_size, test_label_len, test_input_l
     return test_loss, accuracy_words, accuracy_letters, n_letters, mispred_prop_letters, mispred_images, mispred_pred,mispred_target
 
 
-def plot_misclassified(mispred_images, mispred_pred,mispred_target):
+def plot_misclassified(mispred_images, mispred_pred,mispred_target,alphabet):
     """
     Plots 6 mispredicted images, with the true and predicted label.
     
@@ -109,6 +111,7 @@ def plot_misclassified(mispred_images, mispred_pred,mispred_target):
     mispred_images : array - Some mispredicted images
     mispred_pred : array - Their predicted label
     mispred_target : array - Their true label
+    alphabet : String - Alphabet used for decoding
     """
     plt.figure(figsize=(15, 10))
 
@@ -117,8 +120,8 @@ def plot_misclassified(mispred_images, mispred_pred,mispred_target):
         image = mispred_images[i]
         image = image.squeeze(0)
         image = image.cpu().numpy()
-        pred = num_to_label(mispred_pred[i])
-        target = num_to_label(mispred_target[i])
+        pred = num_to_label(mispred_pred[i],alphabet)
+        target = num_to_label(mispred_target[i],alphabet)
 
         plt.imshow(image, cmap = 'gray')
         plt.title(target+"/"+pred, fontsize=12)
@@ -127,8 +130,27 @@ def plot_misclassified(mispred_images, mispred_pred,mispred_target):
     plt.subplots_adjust(wspace=0.2, hspace=-0.8)
 
         
-       
+def test_own_image(model,dir,alphabet,max_str_len,device):
+
+    image = cv2.imread(dir, cv2.IMREAD_GRAYSCALE)
+    image = preprocess(image)/255.
+    image = image.astype(np.float32)
+    
+    h, c = model.init_hidden(1)
+    h = h.to(device)
+    c = c.to(device)
         
+    input = torch.tensor(image)
+    input = input.reshape((1, 1, input.shape[0], input.shape[1]))
+    input = input.to(device)
+        
+    pred, h, c = model(input,h,c)
+
+    _, pred = torch.max(pred.data,dim=2)
+    pred = decode(pred,1,max_str_len)
+    pred = num_to_label(pred[0],alphabet)
+    
+    return pred
     
 
     

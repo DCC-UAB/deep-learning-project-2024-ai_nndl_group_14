@@ -40,14 +40,15 @@ assert torch.cuda.is_available()
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 if __name__ == "__main__":   
+    print("Using device:", device)
     ############################# DATA PROCESSING #############################
     print("Pre-processing...")
     # Definition of the paths
     path_csv = '/home/xnmaster/github-classroom/DCC-UAB/deep-learning-project-2024-ai_nndl_group_14/Inputs/'
     path_images = '/home/xnmaster/github-classroom/DCC-UAB/deep-learning-project-2024-ai_nndl_group_14/Inputs/'
     # Sizes of the datasets
-    train_size = 64000
-    valid_size = 6400
+    train_size = 30080
+    valid_size = 3200
     test_size = valid_size
     batch_size = 128
     
@@ -98,7 +99,7 @@ if __name__ == "__main__":
     ############################# CRNN TRAINING ###############################
     ###########################################################################
     print("CRNN Training...")
-    num_epochs = 3
+    num_epochs = 1
     
     train_loss, valid_loss, words_acc_val, letters_acc_val = train_CRNN(train_loader, model, batch_size, 
                                                                         criterion, optimizer, num_epochs, valid_loader, 
@@ -116,4 +117,16 @@ if __name__ == "__main__":
     print(f"--> Accuracy of the model on the {test_size} test images: {test_accuracy_words:%}")
     print(f"--> Accuracy of the model on the {n_letters} test letters: {test_accuracy_letters:%}")
     print(f"--> Average word's proportion well predicted on mispredicted words : {mispred_prop_letters:%}")
-    plot_misclassified(mispred_images, mispred_pred,mispred_target)
+    plot_misclassified(mispred_images, mispred_pred, mispred_target, alphabet)
+    
+    ###########################################################################
+    ############################## OWN IMAGES #################################
+    ###########################################################################
+    path = '/home/xnmaster/github-classroom/DCC-UAB/deep-learning-project-2024-ai_nndl_group_14/IMAGES_EXTRA/'
+    pred_andreu = test_own_image(model,path+'name_trial_andreu.jpg',alphabet,max_str_len,device)
+    pred_mathias = test_own_image(model,path+'name_trial_mathias.jpg',alphabet,max_str_len,device)
+    pred_pere = test_own_image(model,path+'name_trial_pere.jpg',alphabet,max_str_len,device)
+    
+    print("ANDREU : predicted as {pred_andreu}")
+    print("MATHIAS : predicted as {pred_mathias}")
+    print("PERE : predicted as {pred_pere}")
