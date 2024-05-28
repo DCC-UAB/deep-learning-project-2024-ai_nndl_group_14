@@ -1,4 +1,4 @@
-import wandb
+#import wandb
 import torch
 
 def test(model, test_loader, device="cuda", save:bool= True):
@@ -15,7 +15,7 @@ def test(model, test_loader, device="cuda", save:bool= True):
         print(f"Accuracy of the model on the {total} " +
               f"test images: {correct / total:%}")
         
-        wandb.log({"test_accuracy": correct / total})
+        #wandb.log({"test_accuracy": correct / total})
 
     if save:
         print(len(images))
@@ -30,4 +30,4 @@ def test(model, test_loader, device="cuda", save:bool= True):
                           output_names=['output'],  # the model's output names
                           dynamic_axes={'input': {0: 'batch_size'},  # variable length axes
                                         'output': {0: 'batch_size'}})
-        wandb.save("model.onnx")
+        #wandb.save("model.onnx")
