@@ -9,7 +9,7 @@ def get_n_params(model):
 
 
 class CRNN(nn.Module):
-    def __init__(self, rnn_input_dim, rnn_hidden_dim, n_rnn_layers, output_dim, drop_prob=0.,rnn_cell='LSTM'):
+    def __init__(self, rnn_input_dim, rnn_hidden_dim, n_rnn_layers, output_dim, drop_prob=0.,rnn_cell='RNN'):
         super(CRNN, self).__init__()
         self.rnn_input_dim = rnn_input_dim
         self.rnn_hidden_dim = rnn_hidden_dim
@@ -38,7 +38,9 @@ class CRNN(nn.Module):
             self.rnn = nn.GRU(rnn_input_dim, rnn_hidden_dim, n_rnn_layers, batch_first=True, bidirectional=True, dropout=drop_prob)
         elif self.rnn_cell == 'LSTM':
             self.rnn = nn.LSTM(rnn_input_dim, rnn_hidden_dim, n_rnn_layers, batch_first=True, bidirectional=True, dropout=drop_prob)
-
+        else:
+            self.rnn = nn.RNN(rnn_input_dim, rnn_hidden_dim, n_rnn_layers, batch_first=True, bidirectional=True, dropout=drop_prob)
+            
         self.fc1 = nn.Linear(1024, rnn_input_dim)
         nn.init.kaiming_normal_(self.fc1.weight, mode='fan_in',nonlinearity='relu')
 
