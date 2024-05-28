@@ -21,6 +21,8 @@ def train(model, loader, criterion, optimizer, config):
                 train_log(loss, example_ct, epoch)
 
 
+
+#process each batch
 def train_batch(images, labels, model, optimizer, criterion, device="cuda"):
     images, labels = images.to(device), labels.to(device)
     
