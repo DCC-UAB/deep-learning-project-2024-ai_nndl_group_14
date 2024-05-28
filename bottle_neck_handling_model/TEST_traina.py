@@ -102,8 +102,6 @@ def validate_CRNN(criterion, model, loader, batch_size, valid_label_len, valid_i
         _, pred = torch.max(output.data,dim=2)
         target = target.cpu().numpy()
 
-        missclassifications = missclassifications(batch_size, target, pred, word_misclassifications, letter_misclassifications)
-
         pred = decode(pred,batch_size,max_str_len)
 
         correct_words += np.sum(np.sum((abs(target-pred)),axis=1)==0)
@@ -199,7 +197,7 @@ def train_CRNN(dataloader, model, batch_size, criterion, optimizer, num_epochs, 
         #display_top
         display_top_misclassifications(letter_misclassifications, word_misclassifications)
 
-        # Plotting letter and word misclassifications
+        # Plotting letter and word misclassificationsFmi
         plot_top_misclassifications(letter_misclassifications, top_n=20, title='Top Letter Misclassifications')
         plot_top_misclassifications(word_misclassifications, top_n=20, title='Top Word Misclassifications')
 

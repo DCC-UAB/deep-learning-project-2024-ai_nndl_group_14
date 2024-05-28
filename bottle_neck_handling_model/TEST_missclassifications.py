@@ -21,7 +21,7 @@ def plot_top_misclassifications(misclassifications, top_n=150, title='Top Miscla
 
 def display_top_misclassifications(letter_misclassifications, word_misclassifications, top_n=20):
     """
-    Displays the top misclassified letters and words.
+    Displays the top misclassified letters and words, handling potential data type issues.
     
     Parameters:
     - letter_misclassifications (Counter): Counter of misclassified letter pairs
@@ -30,13 +30,21 @@ def display_top_misclassifications(letter_misclassifications, word_misclassifica
     """
     print(f"Top {top_n} Misclassified Letters:")
     for (true_letter, pred_letter), count in letter_misclassifications.most_common(top_n):
-        print(f"True: '{chr(true_letter)}', Predicted: '{chr(pred_letter)}', Count: {count}")
+        # Ensure the letters are integers before converting to characters
+        if isinstance(true_letter, int) and isinstance(pred_letter, int):
+            print(f"True: '{chr(true_letter)}', Predicted: '{chr(pred_letter)}', Count: {count}")
+        else:
+            print(f"True: '{true_letter}', Predicted: '{pred_letter}', Count: {count}")
 
     print(f"\nTop {top_n} Misclassified Words:")
     for (true_word,), count in word_misclassifications.most_common(top_n):
-        # Convert character indices back to strings if necessary
-        readable_true_word = ''.join([chr(char) for char in true_word if char != -1])
+        # Handle both list of ints and strings correctly
+        if all(isinstance(char, int) for char in true_word):
+            readable_true_word = ''.join([chr(char) for char in true_word if char != -1])
+        else:
+            readable_true_word = true_word  # assuming true_word might be directly a readable string
         print(f"Word: '{readable_true_word}', Count: {count}")
+
 
 
 
