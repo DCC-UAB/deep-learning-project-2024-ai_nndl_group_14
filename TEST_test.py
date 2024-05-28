@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 from TEST_train import decode
 from TEST_Data_Preprocessing import num_to_label, preprocess_image
 import cv2
+import os
 
 
 @torch.no_grad()  # prevent this function from computing gradients
@@ -102,7 +103,7 @@ def test_CRNN(criterion, model, loader, batch_size, test_label_len, test_input_l
     return test_loss, accuracy_words, accuracy_letters, n_letters, mispred_prop_letters, mispred_images, mispred_pred,mispred_target
 
 
-def plot_misclassified(mispred_images, mispred_pred,mispred_target,alphabet):
+def plot_misclassified(mispred_images, mispred_pred,mispred_target,alphabet,save_path,name):
     """
     Plots 6 mispredicted images, with the true and predicted label.
     
@@ -112,25 +113,84 @@ def plot_misclassified(mispred_images, mispred_pred,mispred_target,alphabet):
     mispred_pred : array - Their predicted label
     mispred_target : array - Their true label
     alphabet : String - Alphabet used for decoding
+    save_path : String - The path where to save the plot
+    name : String - Name of the plot file
     """
+    if not os.path.exists(save_path):
+        os.makedirs(save_path)
+     
     plt.figure(figsize=(15, 10))
 
     for i in range(6):
-        ax = plt.subplot(1, 6, i+1)
+        ax = plt.subplot(2, 3, i+1)
         image = mispred_images[i]
         image = image.squeeze(0)
         image = image.cpu().numpy()
         pred = num_to_label(mispred_pred[i],alphabet)
         target = num_to_label(mispred_target[i],alphabet)
 
-        plt.imshow(image, cmap = 'gray')
+        plt.imshow(cv2.rotate(image, cv2.ROTATE_90_COUNTERCLOCKWISE), cmap = 'gray')
         plt.title(target+"/"+pred, fontsize=12)
         plt.axis('off')
 
     plt.subplots_adjust(wspace=0.2, hspace=-0.8)
+    plt.savefig(os.path.join(save_path,name))
+    plt.clf()
+    
+def test_some_images(model, batch_size, loader, max_str_len, alphabet, device, save_path, name):
+    if not os.path.exists(save_path):
+        os.makedirs(save_path)
+     
+    data, targets = next(iter(loader))
+    data, targets = data.to(device), targets.to(device)
+    
+    h, c = model.init_hidden(128)
+    h = h.to(device)
+    if c is not None:
+        c = c.to(device)
+        
+    output, h, c = model(data,h,c)
 
+    _,predictions = torch.max(output.data,dim=2)
+    predictions = decode(predictions,batch_size,max_str_len)
+    targets = targets.cpu().numpy()
+      
+    plt.figure(figsize=(16, 6))
+
+    for i in range(6):
+        plt.subplot(2, 3, i + 1)
+        image = data[i].cpu().numpy().reshape((256,64))
+        pred = predictions[i]
+        target = targets[i]
+        
+        pred = num_to_label(pred,alphabet)
+        target = num_to_label(target,alphabet)
+            
+        plt.imshow(cv2.rotate(image, cv2.ROTATE_90_COUNTERCLOCKWISE), cmap = 'gray')
+        plt.title(target+"/"+pred, fontsize=12)
+        plt.axis('off')
+        
+    plt.subplots_adjust(wspace=0.2, hspace=-0.8)
+    plt.savefig(os.path.join(save_path,name))
+    plt.clf()
         
 def test_own_image(model,dir,alphabet,max_str_len,device):
+    """
+    Apply the model on 3 images made by ourselves.
+    
+    Parameters 
+    ----------
+    model : CRNN - Model to apply
+    dir : String - Path of the images
+    alphabet : String - Alphabet used for decoding
+    max_str_len : Int - Maximum label length
+    device : torch.device - GPU or CPU
+    
+    Returns
+    ----------
+    pred : String - The predicted label
+    
+    """
 
     image = cv2.imread(dir, cv2.IMREAD_GRAYSCALE)
     image = preprocess_image(image)/255.
@@ -150,7 +210,7 @@ def test_own_image(model,dir,alphabet,max_str_len,device):
     _, pred = torch.max(pred,dim=2)
     pred = decode(pred,1,max_str_len)
     pred = num_to_label(pred[0],alphabet)
-    
+
     return pred
     
 
