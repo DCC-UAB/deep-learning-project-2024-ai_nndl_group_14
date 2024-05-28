@@ -1,5 +1,6 @@
 import torch
 import numpy as np
+import matplotlib.pyplot as plt
 
 from TEST_train import decode
 
@@ -59,8 +60,8 @@ def test_CRNN(criterion, model, loader, batch_size, test_label_len, test_input_l
         output, h_state, c_state = model(data, h_state, c_state)
 
         # Inputs of the CTC Loss
-        target_lengths = valid_label_len[(batch*batch_size):((batch+1)*batch_size)]
-        input_lengths = valid_input_len[(batch*batch_size):((batch+1)*batch_size)]
+        target_lengths = test_label_len[(batch*batch_size):((batch+1)*batch_size)]
+        input_lengths = test_input_len[(batch*batch_size):((batch+1)*batch_size)]
         # Application of the loss function
         loss = criterion(output.transpose(0, 1), target, input_lengths, target_lengths)
         # Upgrade the loss value

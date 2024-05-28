@@ -91,14 +91,14 @@ if __name__ == "__main__":
     # Optimizer
     optimizer = optim.Adam(model.parameters(), lr=0.001, weight_decay=0.001)
     print("Model successfully created.")
-    print(f"--> Number of parameters {get_n_params(model)}:")
+    print(f"--> Number of parameters : {get_n_params(model)}")
     model.to(device)
     
     ###########################################################################
     ############################# CRNN TRAINING ###############################
     ###########################################################################
     print("CRNN Training...")
-    num_epochs = 10
+    num_epochs = 3
     
     train_loss, valid_loss, words_acc_val, letters_acc_val = train_CRNN(train_loader, model, batch_size, 
                                                                         criterion, optimizer, num_epochs, valid_loader, 
@@ -111,8 +111,9 @@ if __name__ == "__main__":
     ############################### CRNN TEST #################################
     ###########################################################################
     print("CRNN Test...")
-    test_loss, accuracy_words, accuracy_letters, n_letters, mispred_prop_letters, mispred_images, mispred_pred,mispred_target = test_CRNN(criterion, model, test_loader, batch_size, test_label_len, test_input_len, max_str_len, device)
+    test_loss, test_accuracy_words, test_accuracy_letters, n_letters, mispred_prop_letters, mispred_images, mispred_pred,mispred_target = test_CRNN(criterion, model, test_loader, batch_size, test_label_len, test_input_len, max_str_len, device)
     print("Test successfully applied.")
     print(f"--> Accuracy of the model on the {test_size} test images: {test_accuracy_words:%}")
     print(f"--> Accuracy of the model on the {n_letters} test letters: {test_accuracy_letters:%}")
     print(f"--> Average word's proportion well predicted on mispredicted words : {mispred_prop_letters:%}")
+    plot_misclassified(mispred_images, mispred_pred,mispred_target)
