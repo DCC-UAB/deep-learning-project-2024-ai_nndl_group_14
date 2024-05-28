@@ -138,7 +138,8 @@ def test_own_image(model,dir,alphabet,max_str_len,device):
     
     h, c = model.init_hidden(1)
     h = h.to(device)
-    c = c.to(device)
+    if c is not None:
+        c = c.to(device)
         
     input = torch.tensor(image)
     input = input.reshape((1, 1, input.shape[0], input.shape[1]))
