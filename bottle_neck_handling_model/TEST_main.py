@@ -43,8 +43,8 @@ if __name__ == "__main__":
     ############################# DATA PROCESSING #############################
     print("Pre-processing...")
     # Definition of the paths
-    path_csv = 'deep-learning-project-2024-ai_nndl_group_14/Inputs/'
-    path_images = 'deep-learning-project-2024-ai_nndl_group_14/Inputs/'
+    path_csv = '/home/xnmaster/deep-learning-project-2024-ai_nndl_group_14/Inputs/'
+    path_images = '/home/xnmaster/deep-learning-project-2024-ai_nndl_group_14/Inputs/'
     # Sizes of the datasets
     train_size = 64000
     valid_size = 6400
