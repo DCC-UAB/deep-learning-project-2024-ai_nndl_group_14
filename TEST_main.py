@@ -47,8 +47,8 @@ if __name__ == "__main__":
     path_csv = '/home/xnmaster/github-classroom/DCC-UAB/deep-learning-project-2024-ai_nndl_group_14/Inputs/'
     path_images = '/home/xnmaster/github-classroom/DCC-UAB/deep-learning-project-2024-ai_nndl_group_14/Inputs/'
     # Sizes of the datasets
-    train_size = 30080
-    valid_size = 3200
+    train_size = 64000
+    valid_size = 6400
     test_size = valid_size
     batch_size = 128
     
@@ -88,7 +88,7 @@ if __name__ == "__main__":
     # Loss function
     criterion = torch.nn.CTCLoss()
     # Initialisation of the model
-    model = CRNN(rnn_input_dim, rnn_hidden_dim, n_rnn_layers, output_dim, drop_prob).to(device)
+    model = CRNN(rnn_input_dim, rnn_hidden_dim, n_rnn_layers, output_dim, drop_prob, "GRU").to(device)
     # Optimizer
     optimizer = optim.Adam(model.parameters(), lr=0.001, weight_decay=0.001)
     print("Model successfully created.")
@@ -99,7 +99,7 @@ if __name__ == "__main__":
     ############################# CRNN TRAINING ###############################
     ###########################################################################
     print("CRNN Training...")
-    num_epochs = 1
+    num_epochs = 10
     
     train_loss, valid_loss, words_acc_val, letters_acc_val = train_CRNN(train_loader, model, batch_size, 
                                                                         criterion, optimizer, num_epochs, valid_loader, 
@@ -127,6 +127,6 @@ if __name__ == "__main__":
     pred_mathias = test_own_image(model,path+'name_trial_mathias.jpg',alphabet,max_str_len,device)
     pred_pere = test_own_image(model,path+'name_trial_pere.jpg',alphabet,max_str_len,device)
     
-    print("ANDREU : predicted as {pred_andreu}")
-    print("MATHIAS : predicted as {pred_mathias}")
-    print("PERE : predicted as {pred_pere}")
+    print(f"ANDREU : predicted as {pred_andreu}")
+    print(f"MATHIAS : predicted as {pred_mathias}")
+    print(f"PERE : predicted as {pred_pere}")

@@ -133,7 +133,7 @@ def plot_misclassified(mispred_images, mispred_pred,mispred_target,alphabet):
 def test_own_image(model,dir,alphabet,max_str_len,device):
 
     image = cv2.imread(dir, cv2.IMREAD_GRAYSCALE)
-    image = preprocess(image)/255.
+    image = preprocess_image(image)/255.
     image = image.astype(np.float32)
     
     h, c = model.init_hidden(1)
@@ -146,7 +146,7 @@ def test_own_image(model,dir,alphabet,max_str_len,device):
         
     pred, h, c = model(input,h,c)
 
-    _, pred = torch.max(pred.data,dim=2)
+    _, pred = torch.max(pred,dim=2)
     pred = decode(pred,1,max_str_len)
     pred = num_to_label(pred[0],alphabet)
     
