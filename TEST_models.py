@@ -9,12 +9,13 @@ def get_n_params(model):
 
 
 class CRNN(nn.Module):
-    def __init__(self, rnn_input_dim, rnn_hidden_dim, n_rnn_layers, output_dim, drop_prob=0.):
+    def __init__(self, rnn_input_dim, rnn_hidden_dim, n_rnn_layers, output_dim, drop_prob=0.,rnn_cell='LSTM'):
         super(CRNN, self).__init__()
         self.rnn_input_dim = rnn_input_dim
         self.rnn_hidden_dim = rnn_hidden_dim
         self.n_rnn_layers = n_rnn_layers
         self.output_dim = output_dim
+        self.rnn_cell = rnn_cell
 
         self.conv1 = nn.Conv2d(in_channels=1, out_channels=32, kernel_size=3, padding='same')
         self.norm1 = nn.BatchNorm2d(32)
@@ -33,7 +34,10 @@ class CRNN(nn.Module):
         self.maxpool = nn.MaxPool2d(kernel_size=2)
         self.maxpool2 = nn.MaxPool2d(kernel_size=(1,2))
 
-        self.rnn = nn.LSTM(rnn_input_dim, rnn_hidden_dim, n_rnn_layers, batch_first=True, bidirectional=True, dropout=drop_prob)
+        if self.rnn_cell == 'GRU':
+            self.rnn = nn.GRU(rnn_input_dim, rnn_hidden_dim, n_rnn_layers, batch_first=True, bidirectional=True, dropout=drop_prob)
+        elif self.rnn_cell == 'LSTM':
+            self.rnn = nn.LSTM(rnn_input_dim, rnn_hidden_dim, n_rnn_layers, batch_first=True, bidirectional=True, dropout=drop_prob)
 
         self.fc1 = nn.Linear(1024, rnn_input_dim)
         nn.init.kaiming_normal_(self.fc1.weight, mode='fan_in',nonlinearity='relu')
@@ -66,13 +70,22 @@ class CRNN(nn.Module):
         x = self.fc1(x)               # Size : b,  64, 64
         x = F.relu(x)                 # Size : b,  64, 64
 
-        x, (h, c) = self.rnn(x, (h, c))    # Size : b, 64, 1024
-
+        if self.rnn_cell == 'LSTM': 
+            x, (h, c) = self.rnn(x, (h, c))   # Size : b, 64, 1024
+        else:                       
+            x, h = self.rnn(x, h)     # Size : b, 64, 1024
+        
         x = self.fc2(x)               # Size : b, 64, 30
         x = F.log_softmax(x, dim=2)
         return x, h, c
 
     def init_hidden(self, batch_size):
-        #Initialize the hidden state of the RNN to zeros
+        # Initialize the hidden state of the RNN to zeros
         weight = next(self.parameters()).data
-        return weight.new(2*self.n_rnn_layers, batch_size, self.rnn_hidden_dim).zero_().cuda(), weight.new(2*self.n_rnn_layers, batch_size, self.rnn_hidden_dim).zero_().cuda()
+        
+        if self.rnn_cell == 'LSTM': # in LSTM we have a cell state and a hidden state
+            return weight.new(2*self.n_rnn_layers, batch_size, self.rnn_hidden_dim).zero_().cuda(), weight.new(2*self.n_rnn_layers, batch_size, self.rnn_hidden_dim).zero_().cuda()
+        else:                       # in GRU and RNN we only have a hidden state
+            return weight.new(2*self.n_rnn_layers, batch_size, self.rnn_hidden_dim).zero_().cuda(), None
+
+        
