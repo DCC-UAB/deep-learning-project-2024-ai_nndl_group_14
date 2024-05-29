@@ -94,8 +94,8 @@ if __name__ == "__main__":
     model_LSTM = CRNN(rnn_input_dim, rnn_hidden_dim, n_rnn_layers, output_dim, drop_prob, "LSTM").to(device)
     model_GRU = CRNN(rnn_input_dim, rnn_hidden_dim, n_rnn_layers, output_dim, drop_prob, "GRU").to(device)
     # Optimizer
-    optimizer_LSTM = optim.Adam(model_LSTM.parameters(), lr=0.001) #, weight_decay=0.001
-    optimizer_GRU = optim.Adam(model_GRU.parameters(), lr=0.001) #, weight_decay=0.001
+    optimizer_LSTM = optim.Adam(model_LSTM.parameters(), lr=0.001) 
+    optimizer_GRU = optim.Adam(model_GRU.parameters(), lr=0.001) 
     print("Models successfully created.")
     print(f"--> LSTM : {get_n_params(model_LSTM)} parameters")
     print(f"--> GRU : {get_n_params(model_GRU)} parameters")
@@ -103,7 +103,7 @@ if __name__ == "__main__":
     ###########################################################################
     ############################# CRNN TRAINING ###############################
     ###########################################################################
-    num_epochs = 20
+    num_epochs = 30
         
     print("LSTM Training...")
     t = time.time()
