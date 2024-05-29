@@ -40,7 +40,9 @@ device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 if __name__ == "__main__":   
     print("Using device:", device)
+    ###########################################################################
     ############################# DATA PROCESSING #############################
+    ###########################################################################
     print("Pre-processing...")
     # Definition of the paths
     path_csv = '/home/xnmaster/github-classroom/DCC-UAB/deep-learning-project-2024-ai_nndl_group_14/Inputs/'
@@ -130,6 +132,7 @@ if __name__ == "__main__":
                                                                                                                                 
     visualize_results(train_loss_GRU,valid_loss_GRU,words_acc_val_GRU,letters_acc_val_GRU,save_plots,'GRU_Training.png')
     print("Training successfully completed.")
+    
     ###########################################################################
     ############################### CRNN TEST #################################
     ###########################################################################
