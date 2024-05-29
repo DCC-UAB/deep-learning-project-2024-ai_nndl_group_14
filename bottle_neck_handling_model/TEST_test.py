@@ -1,7 +1,7 @@
 import torch
 import numpy as np
 
-from TEST_train import decode
+from TEST_traina import decode
 
 
 @torch.no_grad()  # prevent this function from computing gradients

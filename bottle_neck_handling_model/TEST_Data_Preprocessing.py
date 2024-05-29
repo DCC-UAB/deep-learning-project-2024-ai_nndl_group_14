@@ -368,7 +368,7 @@ def data_preprocessing(path_csv,path_images,train_size,valid_size,test_size,batc
     return train, valid, test, train_loader, valid_loader, test_loader
 
 if __name__ == "__main__": 
-    destination = '/home/xnmaster/github-classroom/DCC-UAB/deep-learning-project-2024-ai_nndl_group_14/Inputs/'
+    destination = '/home/xnmaster/DeepLearning/'
     print("Extraction of the ZIP files...")
     # Extraction of the zip files ("if" to make sure that we add them once)
     if not os.path.exists(destination+'/validation'):

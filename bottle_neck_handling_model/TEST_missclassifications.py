@@ -5,77 +5,56 @@ import numpy as np
 
 import matplotlib.pyplot as plt
 
-def plot_top_misclassifications(misclassifications, top_n=150, title='Top Misclassifications'):
-    labels, values = zip(*misclassifications.most_common(top_n))
-    indexes = range(len(labels))
-    labels = [f'{chr(l[0])}->{chr(l[1])}' if isinstance(l, tuple) else ''.join([chr(char) for char in l if char != -1]) for l in labels]
+alphabet = u" ABCDEFGHIJKLMNOPQRSTUVWXYZ-'"
 
-    plt.figure(figsize=(10, 8))
-    plt.bar(indexes, values)
-    plt.xlabel('Misclassifications')
-    plt.ylabel('Counts')
-    plt.title(title)
-    plt.xticks(indexes, labels, rotation='vertical')
-    plt.show()
+# Function to analyze misclassifications
+def analyze_misclassifications(predictions, true_labels):
+    letter_misclassifications = Counter()
+
+    for pred_seq, true_seq in zip(predictions, true_labels):
+        pred_seq = [p for p in pred_seq if p != -1]
+        true_seq = [t for t in true_seq if t != -1]
+
+        for pred_char, true_char in zip(pred_seq, true_seq):
+            if pred_char != true_char:
+                letter_misclassifications[(true_char, pred_char)] += 1
+
+    return letter_misclassifications
+
+# Function to display common misclassifications
+def display_common_misclassifications(misclassifications, top_n=10):
+    print("Top Misclassifications:")
+    for (true_char, pred_char), count in misclassifications.most_common(top_n):
+        true_display = alphabet[true_char] if true_char < len(alphabet) else f"Unknown: {true_char}"
+        pred_display = alphabet[pred_char] if pred_char < len(alphabet) else f"Unknown: {pred_char}"
+        print(f"True: '{true_display}', Predicted: '{pred_display}', Count: {count}")
 
 
-def display_top_misclassifications(letter_misclassifications, word_misclassifications, top_n=20):
+
+def display_top_letter_errors(letter_misclassifications, top_n=8):
     """
-    Displays the top misclassified letters and words.
-    
+    Displays the top mispredicted letters for each letter.
+
     Parameters:
     - letter_misclassifications (Counter): Counter of misclassified letter pairs
-    - word_misclassifications (Counter): Counter of misclassified words
-    - top_n (int): Number of top misclassifications to display
+    - top_n (int): Number of top mispredictions to display for each letter
     """
-    print(f"Top {top_n} Misclassified Letters:")
-    for (true_letter, pred_letter), count in letter_misclassifications.most_common(top_n):
-        print(f"True: '{chr(true_letter)}', Predicted: '{chr(pred_letter)}', Count: {count}")
+    # Create a dictionary to hold data organized by true letter
+    organized_misclassifications = {}
 
-    print(f"\nTop {top_n} Misclassified Words:")
-    for (true_word,), count in word_misclassifications.most_common(top_n):
-        # Convert character indices back to strings if necessary
-        readable_true_word = ''.join([chr(char) for char in true_word if char != -1])
-        print(f"Word: '{readable_true_word}', Count: {count}")
+    # Organize misclassifications by true letter
+    for (true_letter, pred_letter), count in letter_misclassifications.items():
+        if true_letter not in organized_misclassifications:
+            organized_misclassifications[true_letter] = []
+        organized_misclassifications[true_letter].append((pred_letter, count))
 
-
-
-def update_misclassifications(pred, target, letter_misclassifications, word_misclassifications):
-    """
-    Updates the misclassification counters for both letters and words.
-
-    Parameters:
-    - pred (numpy array): Decoded predictions from the model.
-    - target (numpy array): Actual labels.
-    - letter_misclassifications (Counter): Counter to track letter-level misclassifications.
-    - word_misclassifications (Counter): Counter to track word-level misclassifications.
-    """
-    batch_size = target.shape[0]
-
-    for idx in range(batch_size):
-        pred_str = "".join([chr(p) for p in pred[idx] if p != -1])
-        true_str = "".join([chr(t) for t in target[idx] if t != -1])
-
-        # Update word-level misclassification if the whole word is incorrect
-        if pred_str != true_str:
-            word_misclassifications[true_str] += 1
-
-        # Convert strings to lists of characters for letter-level comparison
-        pred_chars = list(pred_str)
-        true_chars = list(true_str)
-        min_length = min(len(pred_chars), len(true_chars))
-
-        # Update letter-level misclassifications
-        for i in range(min_length):
-            if pred_chars[i] != true_chars[i]:
-                letter_misclassifications[(true_chars[i], pred_chars[i])] += 1
-
-        # Consider additional characters in longer predictions or labels
-        if len(pred_chars) > len(true_chars):
-            for char in pred_chars[min_length:]:
-                letter_misclassifications[('-', char)] += 1
-        elif len(true_chars) > len(pred_chars):
-            for char in true_chars[min_length:]:
-                letter_misclassifications[(char, '-')] += 1
-
-    return letter_misclassifications, word_misclassifications
+    # Sort and display the results
+    for true_letter in sorted(organized_misclassifications.keys()):
+        mispredictions = organized_misclassifications[true_letter]
+        mispredictions.sort(key=lambda x: x[1], reverse=True)  # Sort by count, descending
+        true_display = alphabet[true_letter] if true_letter < len(alphabet) else f"Unknown: {true_letter}"
+        print(f"Top mispredictions for '{true_display}':")
+        for pred_letter, count in mispredictions[:top_n]:
+            pred_display = alphabet[pred_letter] if pred_letter < len(alphabet) else f"Unknown: {pred_letter}"
+            print(f"  Predicted: '{pred_display}', Count: {count}")
+        print()  # Adds a newline for better readability between letters

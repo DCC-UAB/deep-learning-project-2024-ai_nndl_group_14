@@ -71,7 +71,7 @@ def validate_CRNN(criterion, model, loader, batch_size, valid_label_len, valid_i
     correct_letters = 0
     n_letters = 0
     letter_misclassifications = Counter()
-    word_misclassifications = Counter()
+
     # Gradients are not needed
     model.eval()
     
@@ -101,18 +101,17 @@ def validate_CRNN(criterion, model, loader, batch_size, valid_label_len, valid_i
         # Computation of the accuracies
         _, pred = torch.max(output.data,dim=2)
         target = target.cpu().numpy()
-
-        missclassifications = missclassifications(batch_size, target, pred, word_misclassifications, letter_misclassifications)
-
         pred = decode(pred,batch_size,max_str_len)
 
+        
         correct_words += np.sum(np.sum((abs(target-pred)),axis=1)==0)
         correct_letters += np.sum(abs(target-pred)==0, where=(target!=-1))
 
         n_letters += np.sum(target!=-1)
 
 
-        letter_misclassifications, word_misclassifications = update_misclassifications(pred, target, letter_misclassifications, word_misclassifications)
+        batch_misclassifications = analyze_misclassifications(pred, target)
+        letter_misclassifications.update(batch_misclassifications)
     
     # Average loss over each batch (25 batches in the validation set)
     val_loss /= 25
@@ -120,7 +119,7 @@ def validate_CRNN(criterion, model, loader, batch_size, valid_label_len, valid_i
     accuracy_words = correct_words / len(loader.dataset)
     accuracy_letters = correct_letters / n_letters
     
-    return val_loss, accuracy_words, accuracy_letters, letter_misclassifications , word_misclassifications
+    return val_loss, accuracy_words, accuracy_letters, letter_misclassifications
 
 def train_CRNN(dataloader, model, batch_size, criterion, optimizer, num_epochs, valid_loader, train_label_len, train_input_len, valid_label_len, valid_input_len, max_str_len, device):
     """
@@ -194,14 +193,14 @@ def train_CRNN(dataloader, model, batch_size, criterion, optimizer, num_epochs, 
                 print({ 'batch': batch, 'epoch': epoch, 'training loss': loss.item()})
         
         # Application of the model on the validation set
-        val_loss, accuracy_words, accuracy_letters,letter_misclassifications,word_misclassifications = validate_CRNN(criterion, model, valid_loader, batch_size, valid_label_len, valid_input_len, max_str_len, device)
+        val_loss, accuracy_words, accuracy_letters, letter_misclassifications = validate_CRNN(criterion, model, valid_loader, batch_size, valid_label_len, valid_input_len, max_str_len, device)
         
-        #display_top
-        display_top_misclassifications(letter_misclassifications, word_misclassifications)
 
-        # Plotting letter and word misclassifications
-        plot_top_misclassifications(letter_misclassifications, top_n=20, title='Top Letter Misclassifications')
-        plot_top_misclassifications(word_misclassifications, top_n=20, title='Top Word Misclassifications')
+
+        # Now display the top errors per letter
+        display_common_misclassifications(letter_misclassifications)
+        display_top_letter_errors(letter_misclassifications, top_n=8)
+
 
 
         # Add the needed values to the lists
