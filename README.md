@@ -33,15 +33,30 @@ For the training of those models, we used those parameters :
 
 ## 4 - Test of the models
 
-In this part, we have applied the models implemented on the test dataset. In that part, we did some particular tests, such as ploting at some predictions with its image, looking at mispredicted images, to indentify any recurrent aspect of those images.
-We also looking at the top-3 most mispredicted letters, and their top mispredicted letters. In this part, we can observe that ...
+In this part, we have applied the models implemented on the test dataset. We obtain acceptable results since the Letter Accuracy is around 80%, and the Word Accuracy, around 60%.  
 
-At the end, we also applied the models on own written images. To do so, we have written our names on a paper, and applied the model on them. As we can see...
+In that part, we also did some particular tests, such as ploting at some predictions with its image, looking at mispredicted images, to indentify any recurrent aspect of those images.
+We also looked at the top-3 most mispredicted letters, and their top mispredicted letters. In this part, we observe that with LSTM neurons, 'L' is often predicted as 'E' or 'I', and the same goes with 'N' ann 'E'. For the model with GRU neurons, we find again the 'L' often predicted as 'E', 'N' as 'E', and 'E' as 'R'.
+What we can see here is that, in most of the cases, the model mispredict a letter for a letter having some shape similarities.
+
+At the end, we also applied the models on own written images. To do so, we have written our names on a paper, and applied the model on them. As we can see 
 
 
 
 ## Code structure
-You must create as many folders as you consider. You can use the proposed structure or replace it by the one in the base code that you use as starting point. Do not forget to add Markdown files as needed to explain well the code and how to use it.
+The code is composed by different .py files :
+- Data_Preprocessing.py : containing all the preprocessing functions
+- models.py : containing the definition of the models
+- train.py : containing training/validation and some ploting functions
+- test.py : containing test and ploting functions
+- main.py : managing all the previous files
+
+To run the code, first, we have to run the Data_Preprocessing.py file. This will extract the .zip files if it's not already done. If it's done, it will not do anything else. The only thing that has to be changed is the paths "path_zip" and "destination", which correspond, respectively, to the location of the .zip files and the place where to put the extracted folder.
+
+Then, simply running the main.py file will carry out the pre-processing operations, create the models, train and test them. 
+This run will print some information in the terminal, such as the number of parameters of each model, the results of the training/test; as well as some plots (that will be stored in a folder "Plots"). At the end, we also print a comparative table of both models.
+Again, some paths may need changes : "path_csv", which has to be the location of the 3 .csv files / "path_images", which has to be the location of the extracted folders (="destination") / and "save_plots", which corresponds to the place where we will save the plots during the training.
+
 
 ## Example Code
 The given code is a simple CNN example training on the MNIST dataset. It shows how to set up the [Weights & Biases](https://wandb.ai/site)  package to monitor how your network is learning, or not.
