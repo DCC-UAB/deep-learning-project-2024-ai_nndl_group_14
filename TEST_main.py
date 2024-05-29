@@ -44,15 +44,13 @@ if __name__ == "__main__":
     ###########################################################################
     print("Pre-processing...")
     # Definition of the paths
-    # Those paths can be changed depending on where are the .csv files and the image folders
-    #path_csv = '/home/xnmaster/deep-learning-project-2024-ai_nndl_group_14/Inputs/'
+    ## Those paths CAN BE CHANGED depending on where are the .csv files and the image folders
     path_csv = '/home/xnmaster/github-classroom/DCC-UAB/deep-learning-project-2024-ai_nndl_group_14/Inputs/'
-    #path_images = '/home/xnmaster/deep-learning-project-2024-ai_nndl_group_14/Inputs/'
     path_images = '/home/xnmaster/github-classroom/DCC-UAB/deep-learning-project-2024-ai_nndl_group_14/Inputs/'
     
     # Sizes of the datasets
-    train_size =  300800
-    valid_size = 30080
+    train_size =  64000
+    valid_size = 6400
     test_size = valid_size
     batch_size = 128
     n_valid_batch = valid_size / batch_size
@@ -65,7 +63,7 @@ if __name__ == "__main__":
     num_of_characters = len(alphabet) + 1 
     # Maximum length of predicted labels
     num_of_timestamps = 64
-    # Folder where we will store the plots
+    # Folder where we will store the plots (CAN BE CHANGED)
     save_plots = '/home/xnmaster/github-classroom/DCC-UAB/deep-learning-project-2024-ai_nndl_group_14/Plots/'
     
     train, valid, test, train_loader, valid_loader, test_loader = data_preprocessing(path_csv,path_images,train_size,valid_size,test_size,batch_size,max_str_len,alphabet,save_plots,'Visualize_Images.png')
@@ -107,7 +105,7 @@ if __name__ == "__main__":
     ###########################################################################
     ############################# CRNN TRAINING ###############################
     ###########################################################################
-    num_epochs = 10
+    num_epochs = 3
         
     print("LSTM Training...")
     t = time.time()
@@ -172,8 +170,8 @@ if __name__ == "__main__":
     print("Testing our own images...")
     names = ['name_trial_andreu.jpg','name_trial_mathias.jpg','name_trial_pere.jpg']
     targets = ['ANDREU','MATHIAS','PERE']
-    test_own_image(model_LSTM,path,names,alphabet,max_str_len,device,save_plots,'Own_images_LSTM.png')
-    test_own_image(model_GRU,path,names,alphabet,max_str_len,device,save_plots,'Own_Images_GRU.png')
+    test_own_image(model_LSTM,path,names,alphabet,max_str_len,device,save_plots,'Own_images_LSTM.png',True)
+    test_own_image(model_GRU,path,names,alphabet,max_str_len,device,save_plots,'Own_Images_GRU.png',True)
     print("Test successfully done.")
     
     ###########################################################################
