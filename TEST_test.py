@@ -98,6 +98,7 @@ def test_CRNN(criterion, model, loader, batch_size, test_label_len, test_input_l
         
         n_letters += np.sum(target!=-1)
         
+        # Carry out the misclassification analysis
         batch_misclassifications = analyze_misclassifications(pred, target)
         letter_misclassifications.update(batch_misclassifications)
         

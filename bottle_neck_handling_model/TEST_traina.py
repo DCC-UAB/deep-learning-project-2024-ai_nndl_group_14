@@ -5,8 +5,6 @@ import torch
 import torch.nn as nn
 import os
 
-from bottle_neck_handling_model.TEST_missclassifications import *
-
 def decode(pred,batch_size,str_len):
     """
     Decode the outputs of the model into the label shape
@@ -110,10 +108,6 @@ def validate_CRNN(criterion, model, loader, batch_size, valid_label_len, valid_i
         correct_letters += np.sum(abs(target-pred)==0, where=(target!=-1))
 
         n_letters += np.sum(target!=-1)
-
-
-        #batch_misclassifications = analyze_misclassifications(pred, target)
-        #letter_misclassifications.update(batch_misclassifications)
     
     # Average loss over each batch (25 batches in the validation set)
     val_loss /= 25
@@ -121,7 +115,7 @@ def validate_CRNN(criterion, model, loader, batch_size, valid_label_len, valid_i
     accuracy_words = correct_words / len(loader.dataset)
     accuracy_letters = correct_letters / n_letters
     
-    return val_loss, accuracy_words, accuracy_letters #, letter_misclassifications
+    return val_loss, accuracy_words, accuracy_letters 
 
 def train_CRNN(dataloader, model, batch_size, criterion, optimizer, num_epochs, valid_loader, train_label_len, train_input_len, valid_label_len, valid_input_len, max_str_len, device):
     """
@@ -203,11 +197,6 @@ def train_CRNN(dataloader, model, batch_size, criterion, optimizer, num_epochs, 
             best_model = model.state_dict().copy()
             best_validation_loss = val_loss
             
-
-        # Now display the top errors per letter
-        #display_common_misclassifications(letter_misclassifications)
-        #display_top_letter_errors(letter_misclassifications, top_n=8)
-
         # Add the needed values to the lists
         train_losses.append(loss.item())
         valid_losses.append(val_loss)
