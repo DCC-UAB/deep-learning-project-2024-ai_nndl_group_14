@@ -48,8 +48,8 @@ if __name__ == "__main__":
     path_csv = '/home/xnmaster/github-classroom/DCC-UAB/deep-learning-project-2024-ai_nndl_group_14/Inputs/'
     path_images = '/home/xnmaster/github-classroom/DCC-UAB/deep-learning-project-2024-ai_nndl_group_14/Inputs/'
     # Sizes of the datasets
-    train_size = 64000
-    valid_size = 6400
+    train_size = 128000
+    valid_size = 12800
     test_size = valid_size
     batch_size = 128
     
@@ -82,7 +82,7 @@ if __name__ == "__main__":
     ## Number of neurons of the RNN layers
     rnn_hidden_dim = 512
     ## Number of RNN layers
-    n_rnn_layers = 1
+    n_rnn_layers = 2
     ## Dimension of the output
     output_dim = num_of_characters
     ## Drop rate
@@ -179,8 +179,8 @@ if __name__ == "__main__":
     ###########################################################################
     print("Comparison of the models : ")
     summary = pd.DataFrame({
-        "LSTM" : [time_LSTM, test_accuracy_words_LSTM, test_accuracy_letters_LSTM, mispred_prop_letters_LSTM],
-        "GRU" : [time_GRU, test_accuracy_words_GRU, test_accuracy_letters_GRU, mispred_prop_letters_GRU]
+        "LSTM" : [time_LSTM, 100*test_accuracy_words_LSTM, 100*test_accuracy_letters_LSTM, 100*mispred_prop_letters_LSTM],
+        "GRU" : [time_GRU, 100*test_accuracy_words_GRU, 100*test_accuracy_letters_GRU, 100*mispred_prop_letters_GRU]
     })
     
     summary.index = ["Time of training (s)","Word accuracy (%)", "Letter accuracy (%)","(%) of letters in a mispredicted word ({%})"]

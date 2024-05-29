@@ -63,7 +63,7 @@ class CRNN(nn.Module):
         x = F.relu(x)                 # Size : b, 128, 64, 16
         x = self.maxpool2(x)          # Size : b, 128, 64,  8
         x = self.dropout3(x)
-
+        
         x = x.permute(0,2,3,1)        # Size : b, 64, 8, 128
         x = x.reshape((x.shape[0], x.shape[1], 1024)) # Size : b, 64, 1024
 

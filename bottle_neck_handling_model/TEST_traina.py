@@ -37,11 +37,12 @@ def decode(pred,batch_size,str_len):
         for k in range(64):
             letter = pred[b,k]
             # If the letter is different, and not blank, we add it to the decoded prediction
-            if letter != previous_letter and letter != blank:
-                decoded_batch[b,index] = letter.item()
-                previous_letter = letter
-                index+=1
-
+            if letter != blank:
+                if letter != previous_letter:
+                    decoded_batch[b,index] = letter.item()
+                    previous_letter = letter
+                    index+=1
+                
     return decoded_batch
 
 @torch.no_grad()  # prevent this function from computing gradients
