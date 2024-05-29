@@ -266,7 +266,7 @@ def analyze_misclassifications(predictions, true_labels):
 
     # iterate over the the batch sequences from the decoded predictions and targets
     for pred_seq, true_seq in zip(predictions, true_labels):
-        pred_seq = [p for p in pred_seq if p != -1] # don't append placeholders indicating unfilled positions (-1)
+        pred_seq = [p for p in pred_seq if p != -1] # don't append placeholders indicating unfilled positions (-1) from the decoder
         true_seq = [t for t in true_seq if t != -1]
 
         # iterate over the letters of the given sequence
