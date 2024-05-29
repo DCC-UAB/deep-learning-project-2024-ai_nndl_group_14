@@ -5,7 +5,41 @@ import torch
 import torch.nn as nn
 import os
 
-def decode(pred,batch_size,str_len):
+def decode(pred, batch_size, str_len):
+    """
+    Decode the outputs of the model into the label shape
+
+    Parameters
+    ----------
+    pred : torch.tensor - Output of the model
+    batch_size : Int - Size of a batch
+    str_len : Int - Maximum length of a label
+
+    Returns
+    -------
+    decoded_batch : np.array - Decoded predictions
+
+    """
+    decoded_batch = np.ones((batch_size, str_len), dtype=int) * (-1)
+    blank = 0
+
+    pred = pred.cpu().numpy() 
+    for b in range(batch_size):
+        previous_letter = blank
+        index = 0
+
+        for k in range(64):
+            letter = pred[b, k]
+            if letter != blank:
+                if letter != previous_letter:
+                    decoded_batch[b, index] = letter.item()
+                    previous_letter = letter
+                    index += 1
+            previous_letter = letter
+
+    return decoded_batch
+
+def last_decode(pred,batch_size,str_len):
     """
     Decode the outputs of the model into the label shape
 
