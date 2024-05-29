@@ -50,7 +50,7 @@ To do so, we have written our names on a paper, and applied the model on them. W
 
 ## Code structure
 The code is composed by different .py files :
-- [Data_Preprocessing.py](https://github.com/DCC-UAB/deep-learning-project-2024-ai_nndl_group_14/blob/main/TEST_Data_Preprocessing.py) : containing all the preprocessing functions
+- Data_Preprocessing.py : containing all the preprocessing functions
 - [models.py](https://github.com/DCC-UAB/deep-learning-project-2024-ai_nndl_group_14/blob/main/models/models.py) : containing the definition of the models
 - train.py : containing training/validation and some ploting functions
 - test.py : containing test and ploting functions
