@@ -9,7 +9,7 @@ def get_n_params(model):
 
 
 class CRNN(nn.Module):
-    def __init__(self, rnn_input_dim, rnn_hidden_dim, n_rnn_layers, output_dim, drop_prob=0.,rnn_cell='LSTM'):
+    def __init__(self, rnn_input_dim, rnn_hidden_dim, n_rnn_layers, output_dim, drop_prob=0.,rnn_cell='RNN'):
         super(CRNN, self).__init__()
         self.rnn_input_dim = rnn_input_dim
         self.rnn_hidden_dim = rnn_hidden_dim
@@ -30,15 +30,15 @@ class CRNN(nn.Module):
         self.norm3 = nn.BatchNorm2d(128)
         nn.init.kaiming_normal_(self.conv3.weight, mode='fan_in',nonlinearity='relu')
         self.dropout3 = nn.Dropout2d(p=drop_prob)
-
+        
         self.maxpool = nn.MaxPool2d(kernel_size=2)
         self.maxpool2 = nn.MaxPool2d(kernel_size=(1,2))
 
         if self.rnn_cell == 'GRU':
             self.rnn = nn.GRU(rnn_input_dim, rnn_hidden_dim, n_rnn_layers, batch_first=True, bidirectional=True, dropout=drop_prob)
-        elif self.rnn_cell == 'LSTM':
+        else:
             self.rnn = nn.LSTM(rnn_input_dim, rnn_hidden_dim, n_rnn_layers, batch_first=True, bidirectional=True, dropout=drop_prob)
-
+        
         self.fc1 = nn.Linear(1024, rnn_input_dim)
         nn.init.kaiming_normal_(self.fc1.weight, mode='fan_in',nonlinearity='relu')
 
@@ -63,7 +63,7 @@ class CRNN(nn.Module):
         x = F.relu(x)                 # Size : b, 128, 64, 16
         x = self.maxpool2(x)          # Size : b, 128, 64,  8
         x = self.dropout3(x)
-
+        
         x = x.permute(0,2,3,1)        # Size : b, 64, 8, 128
         x = x.reshape((x.shape[0], x.shape[1], 1024)) # Size : b, 64, 1024
 

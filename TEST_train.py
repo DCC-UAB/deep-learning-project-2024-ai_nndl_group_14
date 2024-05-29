@@ -3,6 +3,7 @@ import matplotlib
 import matplotlib.pyplot as plt
 import torch
 import torch.nn as nn
+import os
 
 def decode(pred,batch_size,str_len):
     """
@@ -135,6 +136,7 @@ def train_CRNN(dataloader, model, batch_size, criterion, optimizer, num_epochs, 
 
     Returns
     -------
+    best_model : Best state of the model trained
     train_losses : array - Training losses over the epochs
     valid_losses : array - Validation losses over the epochs
     words_acc_val : array - Words accuracies on the validation set
@@ -145,6 +147,8 @@ def train_CRNN(dataloader, model, batch_size, criterion, optimizer, num_epochs, 
     valid_losses = []
     words_acc_val = []
     letters_acc_val = []
+    best_model = None
+    best_validation_loss = 30
 
     for epoch in range(num_epochs):
         # We need the gradients here
@@ -188,6 +192,10 @@ def train_CRNN(dataloader, model, batch_size, criterion, optimizer, num_epochs, 
         # Application of the model on the validation set
         val_loss, accuracy_words, accuracy_letters = validate_CRNN(criterion, model, valid_loader, batch_size, valid_label_len, valid_input_len, max_str_len, device)
         
+        if val_loss < best_validation_loss:
+            best_model = model.state_dict().copy()
+            best_validation_loss = val_loss
+            
         # Add the needed values to the lists
         train_losses.append(loss.item())
         valid_losses.append(val_loss)
@@ -196,10 +204,10 @@ def train_CRNN(dataloader, model, batch_size, criterion, optimizer, num_epochs, 
 
         print({ 'epoch': epoch, 'training loss': loss.item(), 'validation loss':val_loss, "Words accuracy":accuracy_words, "Letters accuracy":accuracy_letters})
 
-    return train_losses, valid_losses, words_acc_val, letters_acc_val
+    return best_model, train_losses, valid_losses, words_acc_val, letters_acc_val
 
 
-def visualize_results(train_loss,valid_loss,words_acc_val,letters_acc_val):
+def visualize_results(train_loss,valid_loss,words_acc_val,letters_acc_val,save_path,name):
     """
     Plots the results of the training
 
@@ -209,7 +217,12 @@ def visualize_results(train_loss,valid_loss,words_acc_val,letters_acc_val):
     valid_loss : array - Validation losses over the epochs
     words_acc_val : array - Words accuracies on the validation set
     letters_acc_val : array - Letters accuracies on the validation set
+    save_path : String - Path to save the plot
+    name : String - Name of the plot file
     """
+    if not os.path.exists(save_path):
+        os.makedirs(save_path)
+     
     plt.subplot(1,3,1)
     plt.plot(train_loss, label='Training')
     plt.plot(valid_loss, label='Validation')
@@ -223,3 +236,6 @@ def visualize_results(train_loss,valid_loss,words_acc_val,letters_acc_val):
     plt.subplot(1,3,3)
     plt.plot(letters_acc_val)
     plt.title("Letters accuracy")
+    
+    plt.savefig(os.path.join(save_path,name))
+    plt.clf()

@@ -3,8 +3,7 @@ import matplotlib
 import matplotlib.pyplot as plt
 import torch
 import torch.nn as nn
-
-from TEST_missclassifications import *
+import os
 
 def decode(pred,batch_size,str_len):
     """
@@ -36,11 +35,12 @@ def decode(pred,batch_size,str_len):
         for k in range(64):
             letter = pred[b,k]
             # If the letter is different, and not blank, we add it to the decoded prediction
-            if letter != previous_letter and letter != blank:
-                decoded_batch[b,index] = letter.item()
-                previous_letter = letter
-                index+=1
-
+            if letter != blank:
+                if letter != previous_letter:
+                    decoded_batch[b,index] = letter.item()
+                    previous_letter = letter
+                    index+=1
+                
     return decoded_batch
 
 @torch.no_grad()  # prevent this function from computing gradients
@@ -70,8 +70,7 @@ def validate_CRNN(criterion, model, loader, batch_size, valid_label_len, valid_i
     correct_words = 0
     correct_letters = 0
     n_letters = 0
-    letter_misclassifications = Counter()
-    word_misclassifications = Counter()
+
     # Gradients are not needed
     model.eval()
     
@@ -101,18 +100,13 @@ def validate_CRNN(criterion, model, loader, batch_size, valid_label_len, valid_i
         # Computation of the accuracies
         _, pred = torch.max(output.data,dim=2)
         target = target.cpu().numpy()
-
-        missclassifications = missclassifications(batch_size, target, pred, word_misclassifications, letter_misclassifications)
-
         pred = decode(pred,batch_size,max_str_len)
 
+        
         correct_words += np.sum(np.sum((abs(target-pred)),axis=1)==0)
         correct_letters += np.sum(abs(target-pred)==0, where=(target!=-1))
 
         n_letters += np.sum(target!=-1)
-
-
-        letter_misclassifications, word_misclassifications = update_misclassifications(pred, target, letter_misclassifications, word_misclassifications)
     
     # Average loss over each batch (25 batches in the validation set)
     val_loss /= 25
@@ -120,7 +114,7 @@ def validate_CRNN(criterion, model, loader, batch_size, valid_label_len, valid_i
     accuracy_words = correct_words / len(loader.dataset)
     accuracy_letters = correct_letters / n_letters
     
-    return val_loss, accuracy_words, accuracy_letters, letter_misclassifications , word_misclassifications
+    return val_loss, accuracy_words, accuracy_letters 
 
 def train_CRNN(dataloader, model, batch_size, criterion, optimizer, num_epochs, valid_loader, train_label_len, train_input_len, valid_label_len, valid_input_len, max_str_len, device):
     """
@@ -153,6 +147,8 @@ def train_CRNN(dataloader, model, batch_size, criterion, optimizer, num_epochs, 
     valid_losses = []
     words_acc_val = []
     letters_acc_val = []
+    best_model = None
+    best_validation_loss = 30
 
     for epoch in range(num_epochs):
         # We need the gradients here
@@ -194,16 +190,12 @@ def train_CRNN(dataloader, model, batch_size, criterion, optimizer, num_epochs, 
                 print({ 'batch': batch, 'epoch': epoch, 'training loss': loss.item()})
         
         # Application of the model on the validation set
-        val_loss, accuracy_words, accuracy_letters,letter_misclassifications,word_misclassifications = validate_CRNN(criterion, model, valid_loader, batch_size, valid_label_len, valid_input_len, max_str_len, device)
+        val_loss, accuracy_words, accuracy_letters = validate_CRNN(criterion, model, valid_loader, batch_size, valid_label_len, valid_input_len, max_str_len, device)
         
-        #display_top
-        display_top_misclassifications(letter_misclassifications, word_misclassifications)
-
-        # Plotting letter and word misclassifications
-        plot_top_misclassifications(letter_misclassifications, top_n=20, title='Top Letter Misclassifications')
-        plot_top_misclassifications(word_misclassifications, top_n=20, title='Top Word Misclassifications')
-
-
+        if val_loss < best_validation_loss:
+            best_model = model.state_dict().copy()
+            best_validation_loss = val_loss
+            
         # Add the needed values to the lists
         train_losses.append(loss.item())
         valid_losses.append(val_loss)
@@ -212,10 +204,10 @@ def train_CRNN(dataloader, model, batch_size, criterion, optimizer, num_epochs, 
 
         print({ 'epoch': epoch, 'training loss': loss.item(), 'validation loss':val_loss, "Words accuracy":accuracy_words, "Letters accuracy":accuracy_letters})
 
-    return train_losses, valid_losses, words_acc_val, letters_acc_val
+    return best_model, train_losses, valid_losses, words_acc_val, letters_acc_val
 
 
-def visualize_results(train_loss,valid_loss,words_acc_val,letters_acc_val):
+def visualize_results(train_loss,valid_loss,words_acc_val,letters_acc_val,save_path,name):
     """
     Plots the results of the training
 
@@ -225,7 +217,12 @@ def visualize_results(train_loss,valid_loss,words_acc_val,letters_acc_val):
     valid_loss : array - Validation losses over the epochs
     words_acc_val : array - Words accuracies on the validation set
     letters_acc_val : array - Letters accuracies on the validation set
+    save_path : String - Path to save the plot
+    name : String - Name of the plot file
     """
+    if not os.path.exists(save_path):
+        os.makedirs(save_path)
+     
     plt.subplot(1,3,1)
     plt.plot(train_loss, label='Training')
     plt.plot(valid_loss, label='Validation')
@@ -239,3 +236,6 @@ def visualize_results(train_loss,valid_loss,words_acc_val,letters_acc_val):
     plt.subplot(1,3,3)
     plt.plot(letters_acc_val)
     plt.title("Letters accuracy")
+    
+    plt.savefig(os.path.join(save_path,name))
+    plt.clf()

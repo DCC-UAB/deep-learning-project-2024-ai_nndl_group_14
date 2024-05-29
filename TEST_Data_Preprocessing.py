@@ -44,7 +44,7 @@ def extract_zip(path, destination):
 
     folder_images = os.listdir(destination)
     
-def visualize(images_path,train):
+def visualize(images_path,train,save_path,name):
     """
     Visualize the 6 first images of the training set
     
@@ -52,7 +52,12 @@ def visualize(images_path,train):
     ----------
     images_path : String - Location of the images
     train : DataFrame - Table containing the names of the training images
+    save_path : String - Path to save the plot
+    name : String - Name of the plot file
     """
+    if not os.path.exists(save_path):
+        os.makedirs(save_path)
+     
     plt.figure(figsize=(15, 10))
 
     for i in range(6):
@@ -68,6 +73,8 @@ def visualize(images_path,train):
     
     plt.subplots_adjust(wspace=0.2, hspace=-0.8)
     plt.show()
+    plt.savefig(os.path.join(save_path,name))
+    plt.clf()
     
 def clean(data):
     """
@@ -302,7 +309,7 @@ class HandWrittenDataset(Dataset):
 
         return image, label
 
-def data_preprocessing(path_csv,path_images,train_size,valid_size,test_size,batch_size,max_str_len,alphabet):
+def data_preprocessing(path_csv,path_images,train_size,valid_size,test_size,batch_size,max_str_len,alphabet,save_path,name):
     """
     Pre-process the whole data, using the previous functions
 
@@ -316,6 +323,7 @@ def data_preprocessing(path_csv,path_images,train_size,valid_size,test_size,batc
     batch_size : Int - Size of a batch
     max_str_len : Int - Maximum length of a label
     alphabet : String - Used alphabet for decoding the predictions
+    save_path : String - Path to save the visualize plot
 
     Returns
     -------
@@ -329,7 +337,7 @@ def data_preprocessing(path_csv,path_images,train_size,valid_size,test_size,batc
     train, valid, test = import_csv(path_csv)
 
     # Plot some training images
-    visualize(path_images,train)
+    visualize(path_images,train,save_path,name)
     
     # Labels pre-processing 
     print("- Labels cleaning")
@@ -368,6 +376,7 @@ def data_preprocessing(path_csv,path_images,train_size,valid_size,test_size,batc
     return train, valid, test, train_loader, valid_loader, test_loader
 
 if __name__ == "__main__": 
+    path_zip = '/home/Test Machine'
     destination = '/home/xnmaster/github-classroom/DCC-UAB/deep-learning-project-2024-ai_nndl_group_14/Inputs/'
     print("Extraction of the ZIP files...")
     # Extraction of the zip files ("if" to make sure that we add them once)

@@ -43,8 +43,8 @@ if __name__ == "__main__":
     ############################# DATA PROCESSING #############################
     print("Pre-processing...")
     # Definition of the paths
-    path_csv = '/home/xnmaster/github-classroom/DCC-UAB/deep-learning-project-2024-ai_nndl_group_14/Inputs/'
-    path_images = '/home/xnmaster/github-classroom/DCC-UAB/deep-learning-project-2024-ai_nndl_group_14/Inputs/'
+    path_csv = '/home/xnmaster/deep-learning-project-2024-ai_nndl_group_14/Inputs/'
+    path_images = '/home/xnmaster/deep-learning-project-2024-ai_nndl_group_14/Inputs/'
     # Sizes of the datasets
     train_size = 64000
     valid_size = 6400
@@ -113,6 +113,6 @@ if __name__ == "__main__":
     print("CRNN Test...")
     test_loss, accuracy_words, accuracy_letters, n_letters, mispred_prop_letters, mispred_images, mispred_pred,mispred_target = test_CRNN(criterion, model, test_loader, batch_size, test_label_len, test_input_len, max_str_len, device)
     print("Test successfully applied.")
-    print(f"--> Accuracy of the model on the {test_size} test images: {test_accuracy_words:%}")
-    print(f"--> Accuracy of the model on the {n_letters} test letters: {test_accuracy_letters:%}")
+    print(f"--> Accuracy of the model on the {test_size} test images: {accuracy_words:%}")
+    print(f"--> Accuracy of the model on the {n_letters} test letters: {accuracy_letters:%}")
     print(f"--> Average word's proportion well predicted on mispredicted words : {mispred_prop_letters:%}")
