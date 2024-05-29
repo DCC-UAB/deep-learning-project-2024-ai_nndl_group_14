@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import torch
 import torch.nn as nn
 
-from TEST_missclassifications import *
+from bottle_neck_handling_model.TEST_missclassifications import *
 
 def decode(pred,batch_size,str_len):
     """
