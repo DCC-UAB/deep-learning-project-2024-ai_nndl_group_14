@@ -70,7 +70,6 @@ def validate_CRNN(criterion, model, loader, batch_size, valid_label_len, valid_i
     correct_words = 0
     correct_letters = 0
     n_letters = 0
-    letter_misclassifications = Counter()
 
     # Gradients are not needed
     model.eval()

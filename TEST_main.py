@@ -48,8 +48,8 @@ if __name__ == "__main__":
     path_csv = '/home/xnmaster/github-classroom/DCC-UAB/deep-learning-project-2024-ai_nndl_group_14/Inputs/'
     path_images = '/home/xnmaster/github-classroom/DCC-UAB/deep-learning-project-2024-ai_nndl_group_14/Inputs/'
     # Sizes of the datasets
-    train_size = 128000
-    valid_size = 12800
+    train_size = 30080
+    valid_size = 3200
     test_size = valid_size
     batch_size = 128
     
@@ -103,7 +103,7 @@ if __name__ == "__main__":
     ###########################################################################
     ############################# CRNN TRAINING ###############################
     ###########################################################################
-    num_epochs = 10
+    num_epochs = 20
         
     print("LSTM Training...")
     t = time.time()

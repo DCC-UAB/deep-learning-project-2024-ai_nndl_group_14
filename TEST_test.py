@@ -220,7 +220,8 @@ def test_own_image(model,dir,names,targets,alphabet,max_str_len,device, save_pat
     for name in names:
         path = os.path.join(dir,name)
         image = cv2.imread(path, cv2.IMREAD_GRAYSCALE)
-        image = preprocess_image(image)/255.
+        image = preprocess_image(image)
+        image = image/255.
         image = image.astype(np.float32)
         
         h, c = model.init_hidden(1)
@@ -231,7 +232,7 @@ def test_own_image(model,dir,names,targets,alphabet,max_str_len,device, save_pat
         input = torch.tensor(image)
         input = input.reshape((1, 1, input.shape[0], input.shape[1]))
         input = input.to(device)
-            
+        
         pred, h, c = model(input,h,c)
         
         _, pred = torch.max(pred,dim=2)
