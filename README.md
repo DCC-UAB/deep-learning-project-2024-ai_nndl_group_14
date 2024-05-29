@@ -28,7 +28,6 @@ For the training of those models, we used those parameters :
 - Adam optimizer
 - Drop rate of 0.3 on the 2 last convolutional layers, and the recurrent ones
 - Learning rate of 0.001
-- L2 regularization with $\lambda$ = 0.001
 - 10 epochs
 
 ## 4 - Test of the models
