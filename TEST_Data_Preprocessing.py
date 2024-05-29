@@ -348,7 +348,7 @@ def data_preprocessing(path_csv,path_images,train_size,valid_size,test_size,batc
     # The maximum length of a label is 34, and obtained once and the second maximum length is 24
     #  --> to save memory, we delete the label of size 34 (index=39128) from the training set
     train = train.drop(39128)
-    train.reset_index(inplace = True, drop=True)
+    train.reset_index(inplace = True, drop = True)
     
     # Images datasets
     print("- Images datasets creation")
@@ -376,6 +376,7 @@ def data_preprocessing(path_csv,path_images,train_size,valid_size,test_size,batc
     return train, valid, test, train_loader, valid_loader, test_loader
 
 if __name__ == "__main__": 
+    path_zip = '/home/Test Machine'
     destination = '/home/xnmaster/github-classroom/DCC-UAB/deep-learning-project-2024-ai_nndl_group_14/Inputs/'
     print("Extraction of the ZIP files...")
     # Extraction of the zip files ("if" to make sure that we add them once)

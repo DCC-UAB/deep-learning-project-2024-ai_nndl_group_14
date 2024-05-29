@@ -33,7 +33,7 @@ def decode(pred,batch_size,str_len):
         index=0
         # For each character of the prediction
         for k in range(64):
-            letter = pred[b,k]
+            letter = pred[b,k] # batch and number (this gives an integer)
             # If the letter is different, and not blank, we add it to the decoded prediction
             if letter != previous_letter and letter != blank:
                 decoded_batch[b,index] = letter.item()
@@ -136,6 +136,7 @@ def train_CRNN(dataloader, model, batch_size, criterion, optimizer, num_epochs, 
 
     Returns
     -------
+    best_model : Best state of the model trained
     train_losses : array - Training losses over the epochs
     valid_losses : array - Validation losses over the epochs
     words_acc_val : array - Words accuracies on the validation set

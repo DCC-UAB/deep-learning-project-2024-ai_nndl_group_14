@@ -6,10 +6,14 @@ from TEST_train import decode
 from TEST_Data_Preprocessing import num_to_label, preprocess_image
 import cv2
 import os
+from collections import Counter
+
+
+#from bottle_neck_handling_model.TEST_missclassifications import *
 
 
 @torch.no_grad()  # prevent this function from computing gradients
-def test_CRNN(criterion, model, loader, batch_size, test_label_len, test_input_len, max_str_len, device):
+def test_CRNN(criterion, model, loader, batch_size, test_label_len, test_input_len, max_str_len, device, alphabet):
     """
     Applies the given model on the test set
 
@@ -17,12 +21,13 @@ def test_CRNN(criterion, model, loader, batch_size, test_label_len, test_input_l
     ----------
     criterion : torch.nn - Loss function used
     model : CRNN - The model applied
-    loader : Dataloader - Training values
+    loader : Dataloader - Test values
     batch_size : Int - Size of a batch
     test_label_len : torch.tensor - Real lengths of the labels
     test_input_len : torch.tensor - Lengths of the outputs of the model
     max_str_len : Int - maximum label length
     device : torch.device - GPU or CPU
+    alphabet : String - Alphabet used for decoding
 
     Returns
     -------
@@ -44,6 +49,7 @@ def test_CRNN(criterion, model, loader, batch_size, test_label_len, test_input_l
     
     mispred_prop_letters = 0
     mispred_nb_letters = 0
+    letter_misclassifications = Counter()
 
     # Gradients are not needed
     model.eval()
@@ -92,12 +98,21 @@ def test_CRNN(criterion, model, loader, batch_size, test_label_len, test_input_l
         
         n_letters += np.sum(target!=-1)
         
+        # Carry out the misclassification analysis
+        batch_misclassifications = analyze_misclassifications(pred, target)
+        letter_misclassifications.update(batch_misclassifications)
+        
     # Average loss over each batch (25 batches in the test set) 
     test_loss /= 25
     # Average accuracies over each batch
     accuracy_words = correct_words / len(loader.dataset)
     accuracy_letters = correct_letters / n_letters
     mispred_prop_letters = mispred_prop_letters/mispred_nb_letters
+    
+    # Now display the top errors per letter
+    display_common_misclassifications(letter_misclassifications,alphabet)
+    display_top_letter_errors(letter_misclassifications, alphabet, top_n=3)
+
     
 
     return test_loss, accuracy_words, accuracy_letters, n_letters, mispred_prop_letters, mispred_images, mispred_pred,mispred_target
@@ -138,6 +153,20 @@ def plot_misclassified(mispred_images, mispred_pred,mispred_target,alphabet,save
     plt.clf()
     
 def test_some_images(model, batch_size, loader, max_str_len, alphabet, device, save_path, name):
+    """
+    Print somes images, with their label and the prediction of the model.
+    
+    Parameters
+    ----------
+    model : CRNN - Model to apply
+    batch_size : Int - Size of a batch
+    loader : Dataloader - Test values
+    max_str_len : Int - Maximum length of a label
+    alphabet : String - Alphabet sed for decoding
+    device : torch.device - GPU or CPU
+    save_path : String - Path of the folder to save the plot
+    name : Name of the plot
+    """
     if not os.path.exists(save_path):
         os.makedirs(save_path)
      
@@ -174,7 +203,7 @@ def test_some_images(model, batch_size, loader, max_str_len, alphabet, device, s
     plt.savefig(os.path.join(save_path,name))
     plt.clf()
         
-def test_own_image(model,dir,alphabet,max_str_len,device):
+def test_own_image(model,dir,names,targets,alphabet,max_str_len,device, save_path,save_name):
     """
     Apply the model on 3 images made by ourselves.
     
@@ -182,37 +211,95 @@ def test_own_image(model,dir,alphabet,max_str_len,device):
     ----------
     model : CRNN - Model to apply
     dir : String - Path of the images
+    names : List - Names of the files
     alphabet : String - Alphabet used for decoding
     max_str_len : Int - Maximum label length
     device : torch.device - GPU or CPU
-    
-    Returns
-    ----------
-    pred : String - The predicted label
-    
     """
-
-    image = cv2.imread(dir, cv2.IMREAD_GRAYSCALE)
-    image = preprocess_image(image)/255.
-    image = image.astype(np.float32)
-    
-    h, c = model.init_hidden(1)
-    h = h.to(device)
-    if c is not None:
-        c = c.to(device)
+    k=0
+    for name in names:
+        path = os.path.join(dir,name)
+        image = cv2.imread(path, cv2.IMREAD_GRAYSCALE)
+        image = preprocess_image(image)
+        image = image/255.
+        image = image.astype(np.float32)
         
-    input = torch.tensor(image)
-    input = input.reshape((1, 1, input.shape[0], input.shape[1]))
-    input = input.to(device)
+        h, c = model.init_hidden(1)
+        h = h.to(device)
+        if c is not None:
+            c = c.to(device)
+            
+        input = torch.tensor(image)
+        input = input.reshape((1, 1, input.shape[0], input.shape[1]))
+        input = input.to(device)
         
-    pred, h, c = model(input,h,c)
-
-    _, pred = torch.max(pred,dim=2)
-    pred = decode(pred,1,max_str_len)
-    pred = num_to_label(pred[0],alphabet)
-
-    return pred
+        pred, h, c = model(input,h,c)
+        
+        _, pred = torch.max(pred,dim=2)
+        pred = decode(pred,1,max_str_len)
+        
+        pred = num_to_label(pred[0],alphabet)
+        
+        plt.subplot(1, 3, k+1)
+        plt.imshow(cv2.rotate(image, cv2.ROTATE_90_COUNTERCLOCKWISE), cmap = 'gray')
+        plt.title(targets[k]+"/"+pred, fontsize=12)
+        plt.axis('off')
+        k+=1
     
+    plt.subplots_adjust(wspace=0.2, hspace=-0.8)
+    plt.savefig(os.path.join(save_path,save_name))
+    plt.clf()
+    
+def analyze_misclassifications(predictions, true_labels):
+    letter_misclassifications = Counter()
+
+    for pred_seq, true_seq in zip(predictions, true_labels):
+        pred_seq = [p for p in pred_seq if p != -1]
+        true_seq = [t for t in true_seq if t != -1]
+
+        for pred_char, true_char in zip(pred_seq, true_seq):
+            if pred_char != true_char:
+                letter_misclassifications[(true_char, pred_char)] += 1
+
+    return letter_misclassifications
+
+def display_common_misclassifications(misclassifications, alphabet,top_n=10):
+    print("Top Misclassifications:")
+    for (true_char, pred_char), count in misclassifications.most_common(top_n):
+        true_display = alphabet[true_char] if true_char < len(alphabet) else f"Unknown: {true_char}"
+        pred_display = alphabet[pred_char] if pred_char < len(alphabet) else f"Unknown: {pred_char}"
+        print(f"True: '{true_display}', Predicted: '{pred_display}', Count: {count}")
+
+
+
+def display_top_letter_errors(letter_misclassifications, alphabet, top_n=8):
+    """
+    Displays the top mispredicted letters for each letter.
+
+    Parameters:
+    - letter_misclassifications (Counter): Counter of misclassified letter pairs
+    - top_n (int): Number of top mispredictions to display for each letter
+    """
+    # Create a dictionary to hold data organized by true letter
+    organized_misclassifications = {}
+
+    # Organize misclassifications by true letter
+    for (true_letter, pred_letter), count in letter_misclassifications.items():
+        if true_letter not in organized_misclassifications:
+            organized_misclassifications[true_letter] = []
+        organized_misclassifications[true_letter].append((pred_letter, count))
+
+    # Sort and display the results
+    for true_letter in sorted(organized_misclassifications.keys()):
+        mispredictions = organized_misclassifications[true_letter]
+        mispredictions.sort(key=lambda x: x[1], reverse=True)  # Sort by count, descending
+        true_display = alphabet[true_letter] if true_letter < len(alphabet) else f"Unknown: {true_letter}"
+        print(f"Top mispredictions for '{true_display}':")
+        for pred_letter, count in mispredictions[:top_n]:
+            pred_display = alphabet[pred_letter] if pred_letter < len(alphabet) else f"Unknown: {pred_letter}"
+            print(f"  Predicted: '{pred_display}', Count: {count}")
+        print()  # Adds a newline for better readability between letters
+
 
     
 
