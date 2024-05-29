@@ -21,7 +21,7 @@ from torch.utils.data import Dataset, DataLoader
 from torchvision.utils import make_grid
 
 
-from TEST_traina import *
+from TEST_train import *
 from TEST_test import *
 from TEST_Data_Preprocessing import *
 from TEST_models import *
