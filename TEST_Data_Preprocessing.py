@@ -376,6 +376,7 @@ def data_preprocessing(path_csv,path_images,train_size,valid_size,test_size,batc
     return train, valid, test, train_loader, valid_loader, test_loader
 
 if __name__ == "__main__": 
+    path_zip = '/home/Test Machine'
     destination = '/home/xnmaster/github-classroom/DCC-UAB/deep-learning-project-2024-ai_nndl_group_14/Inputs/'
     print("Extraction of the ZIP files...")
     # Extraction of the zip files ("if" to make sure that we add them once)
