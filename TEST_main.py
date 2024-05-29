@@ -105,7 +105,7 @@ if __name__ == "__main__":
     ###########################################################################
     ############################# CRNN TRAINING ###############################
     ###########################################################################
-    num_epochs = 10
+    num_epochs = 3
     print("LSTM Training...")
     best_LSTM, train_loss_LSTM, valid_loss_LSTM, words_acc_val_LSTM, letters_acc_val_LSTM = train_CRNN(train_loader, model_LSTM, batch_size, 
                                                                         criterion, optimizer_LSTM, num_epochs, valid_loader, 
@@ -160,19 +160,20 @@ if __name__ == "__main__":
     ###########################################################################
     path = '/home/xnmaster/github-classroom/DCC-UAB/deep-learning-project-2024-ai_nndl_group_14/IMAGES_EXTRA/'
     print("Testing our own images with LSTM...")
-    pred_andreu_LSTM = test_own_image(model_LSTM,path+'name_trial_andreu.jpg',alphabet,max_str_len,device)
-    pred_mathias_LSTM = test_own_image(model_LSTM,path+'name_trial_mathias.jpg',alphabet,max_str_len,device)
-    pred_pere_LSTM = test_own_image(model_LSTM,path+'name_trial_pere.jpg',alphabet,max_str_len,device)
+    names = ['name_trial_andreu.jpg','name_trial_mathias.jpg','name_trial_pere.jpg']
+    targets = ['ANDREU','MATHIAS','PERE']
+    test_own_image(model_LSTM,path,names,targets,alphabet,max_str_len,device)
     
-    print(f"ANDREU : predicted as {pred_andreu_LSTM}")
-    print(f"MATHIAS : predicted as {pred_mathias_LSTM}")
-    print(f"PERE : predicted as {pred_pere_LSTM}")
+    #print(f"ANDREU : predicted as {pred_andreu_LSTM}")
+    #print(f"MATHIAS : predicted as {pred_mathias_LSTM}")
+    #print(f"PERE : predicted as {pred_pere_LSTM}")
     
     print("Testing our own images with GRU...")
-    pred_andreu_GRU = test_own_image(model_GRU,path+'name_trial_andreu.jpg',alphabet,max_str_len,device)
-    pred_mathias_GRU = test_own_image(model_GRU,path+'name_trial_mathias.jpg',alphabet,max_str_len,device)
-    pred_pere_GRU = test_own_image(model_GRU,path+'name_trial_pere.jpg',alphabet,max_str_len,device)
+    test_own_image(model_GRU,path,names,targets,alphabet,max_str_len,device)
+    #pred_andreu_GRU = test_own_image(model_GRU,path+'name_trial_andreu.jpg',alphabet,max_str_len,device)
+    #pred_mathias_GRU = test_own_image(model_GRU,path+'name_trial_mathias.jpg',alphabet,max_str_len,device)
+    #pred_pere_GRU = test_own_image(model_GRU,path+'name_trial_pere.jpg',alphabet,max_str_len,device)
     
-    print(f"ANDREU : predicted as {pred_andreu_GRU}")
-    print(f"MATHIAS : predicted as {pred_mathias_GRU}")
-    print(f"PERE : predicted as {pred_pere_GRU}")
+    #print(f"ANDREU : predicted as {pred_andreu_GRU}")
+    #print(f"MATHIAS : predicted as {pred_mathias_GRU}")
+    #print(f"PERE : predicted as {pred_pere_GRU}")

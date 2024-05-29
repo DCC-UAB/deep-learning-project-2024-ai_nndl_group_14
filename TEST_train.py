@@ -136,6 +136,7 @@ def train_CRNN(dataloader, model, batch_size, criterion, optimizer, num_epochs, 
 
     Returns
     -------
+    best_model : Best state of the model trained
     train_losses : array - Training losses over the epochs
     valid_losses : array - Validation losses over the epochs
     words_acc_val : array - Words accuracies on the validation set
@@ -193,7 +194,7 @@ def train_CRNN(dataloader, model, batch_size, criterion, optimizer, num_epochs, 
         
         if val_loss < best_validation_loss:
             best_model = model.state_dict().copy()
-            best_validation_loss = val_loss
+            best_validation_loss = val_loss.copy()
             
         # Add the needed values to the lists
         train_losses.append(loss.item())
