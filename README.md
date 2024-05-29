@@ -38,7 +38,13 @@ In that part, we also did some particular tests, such as ploting at some predict
 We also looked at the top-3 most mispredicted letters, and their top mispredicted letters. In this part, we observe that with LSTM neurons, 'L' is often predicted as 'E' or 'I', and the same goes with 'N' ann 'E'. For the model with GRU neurons, we find again the 'L' often predicted as 'E', 'N' as 'E', and 'E' as 'R'.
 What we can see here is that, in most of the cases, the model mispredict a letter for a letter having some shape similarities.
 
-At the end, we also applied the models on own written images. To do so, we have written our names on a paper, and applied the model on them. As we can see 
+At the end, we also applied the models on own written images. All the code on this can be found in the following folder -> [Trying with our own images](https://github.com/DCC-UAB/deep-learning-project-2024-ai_nndl_group_14/tree/main/IMAGES_EXTRA), where you will be able to find:
+- [NOTEBOOK](https://github.com/DCC-UAB/deep-learning-project-2024-ai_nndl_group_14/blob/main/IMAGES_EXTRA/Project_NN_v6_WORKSWELL_NAMETRIAL.ipynb) where we train the model and then make predictions based on the new images. The accuracy shown in this file is similar to the one mentioned before.
+- [PYTHON FILE](https://github.com/DCC-UAB/deep-learning-project-2024-ai_nndl_group_14/blob/main/IMAGES_EXTRA/function_new_images.py) which just contains the function used to make the predictions for images, it can also be found in the notebook.
+- IMAGES USED, three images which contain our names, to test it on them.
+- [RESULTING IMAGE](https://github.com/DCC-UAB/deep-learning-project-2024-ai_nndl_group_14/blob/main/IMAGES_EXTRA/FINAL.png), shows the image where we compare the photos amd the predictions done by our model thorugh the function.
+
+To do so, we have written our names on a paper, and applied the model on them. We encountered some problems regarding the format of the images and their sizes. This is because in the dataset our model was trained on, all images are of a similar shape and colour (binarized images). To fix this changes and make our predictions good, we used the functions inside the cv2 library, which allow us to binarize them and resize them in a way that 
 
 
 
