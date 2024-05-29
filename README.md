@@ -12,8 +12,8 @@ We decided to put this special value apart, and consider a maximum length of 24.
 
 ## 3 - Models
 Considering the model, we have implemented 3 models : 
-  -  CRNN model using LSTM
-  -  CRNN model using GRU
+  -  [CRNN model using LSTM](https://github.com/DCC-UAB/deep-learning-project-2024-ai_nndl_group_14/blob/main/best_model_LSTM.pth)
+  -  [CRNN model using GRU](https://github.com/DCC-UAB/deep-learning-project-2024-ai_nndl_group_14/blob/main/best_model_GRU.pth)
   -  ...
 
 For the Convolutional and Recurrent Neural Networks, we first apply 3 convolutional layers with 3x3 filters, ReLU activation, same padding, and batch normalization, followed by a linear layer, with ReLU activation, in order to obtain a final activation map of 64x64. This map will then pass through 2 LSTM bi-directional recurrent layers, of 512 neurons. 
@@ -50,8 +50,8 @@ To do so, we have written our names on a paper, and applied the model on them. W
 
 ## Code structure
 The code is composed by different .py files :
-- Data_Preprocessing.py : containing all the preprocessing functions
-- models.py : containing the definition of the models
+- [Data_Preprocessing.py](https://github.com/DCC-UAB/deep-learning-project-2024-ai_nndl_group_14/blob/main/TEST_Data_Preprocessing.py) : containing all the preprocessing functions
+- [models.py](https://github.com/DCC-UAB/deep-learning-project-2024-ai_nndl_group_14/blob/main/models/models.py) : containing the definition of the models
 - train.py : containing training/validation and some ploting functions
 - test.py : containing test and ploting functions
 - main.py : managing all the previous files
