@@ -348,7 +348,7 @@ def data_preprocessing(path_csv,path_images,train_size,valid_size,test_size,batc
     # The maximum length of a label is 34, and obtained once and the second maximum length is 24
     #  --> to save memory, we delete the label of size 34 (index=39128) from the training set
     train = train.drop(39128)
-    train.reset_index(inplace = True, drop=True)
+    train.reset_index(inplace = True, drop = True)
     
     # Images datasets
     print("- Images datasets creation")

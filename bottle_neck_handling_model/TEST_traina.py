@@ -5,6 +5,32 @@ import torch
 import torch.nn as nn
 import os
 
+def try_decode(pred,batch_size,str_len):
+    decoded_batch = np.ones((batch_size,str_len),dtype=int)*(-1)
+    blank = 0
+    
+    for b in range(batch_size):
+        # For each prediction
+        previous_letter = blank
+        index=0
+        # For each character of the prediction
+        for k in range(64):
+            letter = pred[b,k]
+            # If the letter is different, and not blank, we add it to the decoded prediction
+            if letter != blank:
+                if letter == previous_letter and (k==1 or pred[b,k]!=pred[b,k-2]):
+                    decoded_batch[b,index] = letter.item()
+                    previous_letter = letter
+                    index+=1
+                elif pred[b,k] != previous_letter:
+                    decoded_batch[b,index] = letter.item()
+                    previous_letter = letter
+                    index+=1
+                
+    return decoded_batch
+    
+    
+
 def decode(pred,batch_size,str_len):
     """
     Decode the outputs of the model into the label shape
