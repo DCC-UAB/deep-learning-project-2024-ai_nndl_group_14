@@ -86,7 +86,7 @@ if __name__ == "__main__":
     ## Dimension of the output
     output_dim = num_of_characters
     ## Drop rate
-    drop_prob = 0.5
+    drop_prob = 0.4
 
     # Loss function
     criterion = torch.nn.CTCLoss()
@@ -94,8 +94,8 @@ if __name__ == "__main__":
     model_LSTM = CRNN(rnn_input_dim, rnn_hidden_dim, n_rnn_layers, output_dim, drop_prob, "LSTM").to(device)
     model_GRU = CRNN(rnn_input_dim, rnn_hidden_dim, n_rnn_layers, output_dim, drop_prob, "GRU").to(device)
     # Optimizer
-    optimizer_LSTM = optim.Adam(model_LSTM.parameters(), lr=0.001, weight_decay=0.001)
-    optimizer_GRU = optim.Adam(model_GRU.parameters(), lr=0.001, weight_decay=0.001)
+    optimizer_LSTM = optim.Adam(model_LSTM.parameters(), lr=0.002, weight_decay=0.002)
+    optimizer_GRU = optim.Adam(model_GRU.parameters(), lr=0.002, weight_decay=0.002)
     print("Models successfully created.")
     print(f"--> LSTM : {get_n_params(model_LSTM)} parameters")
     print(f"--> GRU : {get_n_params(model_GRU)} parameters")

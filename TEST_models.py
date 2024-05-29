@@ -20,7 +20,6 @@ class CRNN(nn.Module):
         self.conv1 = nn.Conv2d(in_channels=1, out_channels=32, kernel_size=3, padding='same')
         self.norm1 = nn.BatchNorm2d(32)
         nn.init.kaiming_normal_(self.conv1.weight, mode='fan_in',nonlinearity='relu')
-        self.dropout1 = nn.Dropout2d(p=drop_prob)
         
         self.conv2 = nn.Conv2d(in_channels=32, out_channels=64, kernel_size=3, padding='same')
         self.norm2 = nn.BatchNorm2d(64)
@@ -52,7 +51,6 @@ class CRNN(nn.Module):
         x = self.norm1(x)             # Size : b, 32, 256, 64
         x = F.relu(x)                 # Size : b, 32, 256, 64
         x = self.maxpool(x)           # Size : b, 32, 128, 32
-        x = self.dropout1(x)
 
         x = self.conv2(x)             # Size : b, 64, 128, 32
         x = self.norm2(x)             # Size : b, 64, 128, 32
