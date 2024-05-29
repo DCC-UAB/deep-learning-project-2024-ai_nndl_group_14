@@ -32,7 +32,7 @@ def decode(pred,batch_size,str_len):
         index=0
         # For each character of the prediction
         for k in range(64):
-            letter = pred[b,k]
+            letter = pred[b,k] # batch and number (this gives an integer)
             # If the letter is different, and not blank, we add it to the decoded prediction
             if letter != previous_letter and letter != blank:
                 decoded_batch[b,index] = letter.item()
