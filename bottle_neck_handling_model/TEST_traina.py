@@ -3,6 +3,7 @@ import matplotlib
 import matplotlib.pyplot as plt
 import torch
 import torch.nn as nn
+import os
 
 from bottle_neck_handling_model.TEST_missclassifications import *
 
@@ -203,10 +204,8 @@ def train_CRNN(dataloader, model, batch_size, criterion, optimizer, num_epochs, 
             
 
         # Now display the top errors per letter
-        display_common_misclassifications(letter_misclassifications)
-        display_top_letter_errors(letter_misclassifications, top_n=8)
-
-
+        #display_common_misclassifications(letter_misclassifications)
+        #display_top_letter_errors(letter_misclassifications, top_n=8)
 
         # Add the needed values to the lists
         train_losses.append(loss.item())
