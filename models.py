@@ -9,7 +9,7 @@ def get_n_params(model):
 
 
 class CRNN(nn.Module):
-    def __init__(self, rnn_input_dim, rnn_hidden_dim, n_rnn_layers, output_dim, drop_prob=0.,rnn_cell='RNN'):
+    def __init__(self, rnn_input_dim, rnn_hidden_dim, n_rnn_layers, output_dim, drop_prob=0.,rnn_cell='LSTM'):
         super(CRNN, self).__init__()
         self.rnn_input_dim = rnn_input_dim
         self.rnn_hidden_dim = rnn_hidden_dim
@@ -85,7 +85,7 @@ class CRNN(nn.Module):
         
         if self.rnn_cell == 'LSTM': # in LSTM we have a cell state and a hidden state
             return weight.new(2*self.n_rnn_layers, batch_size, self.rnn_hidden_dim).zero_().cuda(), weight.new(2*self.n_rnn_layers, batch_size, self.rnn_hidden_dim).zero_().cuda()
-        else:                       # in GRU and RNN we only have a hidden state
+        else:                       # in GRU we only have a hidden state
             return weight.new(2*self.n_rnn_layers, batch_size, self.rnn_hidden_dim).zero_().cuda(), None
 
         

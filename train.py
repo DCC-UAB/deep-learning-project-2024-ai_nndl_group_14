@@ -20,16 +20,21 @@ def decode(pred, batch_size, str_len):
     decoded_batch : np.array - Decoded predictions
 
     """
+    # We initialize the decoded predictions
     decoded_batch = np.ones((batch_size, str_len), dtype=int) * (-1)
+    # We define the blank symbol
     blank = 0
-
+    # Convert the prediction into array numpy
     pred = pred.cpu().numpy() 
+    
     for b in range(batch_size):
+        # For each prediction
         previous_letter = blank
         index = 0
-
+        # For each character of the prediction
         for k in range(64):
-            letter = pred[b, k]
+            letter = pred[b, k]  
+            # If the letter is different, and not blank, we add it to the decoded prediction
             if letter != blank:
                 if letter != previous_letter:
                     decoded_batch[b, index] = letter.item()
@@ -77,7 +82,7 @@ def last_decode(pred,batch_size,str_len):
     return decoded_batch
 
 @torch.no_grad()  # prevent this function from computing gradients
-def validate_CRNN(criterion, model, loader, batch_size, valid_label_len, valid_input_len, max_str_len, device):
+def validate_CRNN(criterion, model, loader, batch_size, valid_label_len, valid_input_len, max_str_len, device,n_valid_batch):
     """
     Applies the given model on the validation set
 
@@ -89,7 +94,7 @@ def validate_CRNN(criterion, model, loader, batch_size, valid_label_len, valid_i
     batch_size : Int - Size of a batch
     valid_label_len : torch.tensor - Real lengths of the labels
     valid_input_len : torch.tensor - Lengths of the outputs of the model
-    max_str_len : Int - maximum label length
+    max_str_len : Int - Maximum label length
     device : torch.device - GPU or CPU
 
     Returns
@@ -141,15 +146,15 @@ def validate_CRNN(criterion, model, loader, batch_size, valid_label_len, valid_i
 
         n_letters += np.sum(target!=-1)
     
-    # Average loss over each batch (25 batches in the validation set)
-    val_loss /= 25
+    # Average loss over each batch 
+    val_loss /= n_valid_batch
     # Average accuracies over each batch
     accuracy_words = correct_words / len(loader.dataset)
     accuracy_letters = correct_letters / n_letters
     
     return val_loss, accuracy_words, accuracy_letters
 
-def train_CRNN(dataloader, model, batch_size, criterion, optimizer, num_epochs, valid_loader, train_label_len, train_input_len, valid_label_len, valid_input_len, max_str_len, device):
+def train_CRNN(dataloader, model, batch_size, criterion, optimizer, num_epochs, valid_loader, train_label_len, train_input_len, valid_label_len, valid_input_len, max_str_len, device, n_valid_batch):
     """
     Trains the model on the training set
 
@@ -220,11 +225,11 @@ def train_CRNN(dataloader, model, batch_size, criterion, optimizer, num_epochs, 
             # We update our model
             optimizer.step()
 
-            if batch%30 == 0:
+            if batch%500 == 0:
                 print({ 'batch': batch, 'epoch': epoch, 'training loss': loss.item()})
         
         # Application of the model on the validation set
-        val_loss, accuracy_words, accuracy_letters = validate_CRNN(criterion, model, valid_loader, batch_size, valid_label_len, valid_input_len, max_str_len, device)
+        val_loss, accuracy_words, accuracy_letters = validate_CRNN(criterion, model, valid_loader, batch_size, valid_label_len, valid_input_len, max_str_len, device, n_valid_batch)
         
         if val_loss < best_validation_loss:
             best_model = model.state_dict().copy()

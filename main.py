@@ -20,12 +20,11 @@ from torch.utils.data import Dataset, DataLoader
 from torchvision.utils import make_grid
 
 
-from TEST_train import *
-from TEST_test import *
-from TEST_Data_Preprocessing import *
-from TEST_models import *
-#from utils.utils import *
-#from tqdm.auto import tqdm
+from train import *
+from test import *
+from Data_Preprocessing import *
+from models import *
+
 
 # Ensure deterministic behavior
 torch.backends.cudnn.deterministic = True
@@ -45,16 +44,18 @@ if __name__ == "__main__":
     ###########################################################################
     print("Pre-processing...")
     # Definition of the paths
-
+    # Those paths can be changed depending on where are the .csv files and the image folders
     #path_csv = '/home/xnmaster/deep-learning-project-2024-ai_nndl_group_14/Inputs/'
     path_csv = '/home/xnmaster/github-classroom/DCC-UAB/deep-learning-project-2024-ai_nndl_group_14/Inputs/'
     #path_images = '/home/xnmaster/deep-learning-project-2024-ai_nndl_group_14/Inputs/'
     path_images = '/home/xnmaster/github-classroom/DCC-UAB/deep-learning-project-2024-ai_nndl_group_14/Inputs/'
+    
     # Sizes of the datasets
-    train_size =  300800
-    valid_size = 30080
+    train_size =  30080
+    valid_size = 3200
     test_size = valid_size
     batch_size = 128
+    n_valid_batch = valid_size / batch_size
     
     # Used alphabet
     alphabet = u" ABCDEFGHIJKLMNOPQRSTUVWXYZ-'"
@@ -94,8 +95,8 @@ if __name__ == "__main__":
     # Loss function
     criterion = torch.nn.CTCLoss()
     # Initialisation of the model
-    model_LSTM = CRNN(rnn_input_dim, rnn_hidden_dim, n_rnn_layers, output_dim, drop_prob, "LSTM").to(device)
-    model_GRU = CRNN(rnn_input_dim, rnn_hidden_dim, n_rnn_layers, output_dim, drop_prob, "GRU").to(device)
+    model_LSTM = models.CRNN(rnn_input_dim, rnn_hidden_dim, n_rnn_layers, output_dim, drop_prob, "LSTM").to(device)
+    model_GRU = models.CRNN(rnn_input_dim, rnn_hidden_dim, n_rnn_layers, output_dim, drop_prob, "GRU").to(device)
     # Optimizer
     optimizer_LSTM = optim.Adam(model_LSTM.parameters(), lr=0.001) 
     optimizer_GRU = optim.Adam(model_GRU.parameters(), lr=0.001) 
@@ -106,14 +107,14 @@ if __name__ == "__main__":
     ###########################################################################
     ############################# CRNN TRAINING ###############################
     ###########################################################################
-    num_epochs = 10
+    num_epochs = 5
         
     print("LSTM Training...")
     t = time.time()
     best_LSTM, train_loss_LSTM, valid_loss_LSTM, words_acc_val_LSTM, letters_acc_val_LSTM = train_CRNN(train_loader, model_LSTM, batch_size, 
                                                                         criterion, optimizer_LSTM, num_epochs, valid_loader, 
                                                                         train_label_len, train_input_len, valid_label_len, 
-                                                                        valid_input_len, max_str_len, device)
+                                                                        valid_input_len, max_str_len, device,n_valid_batch)
     
     time_LSTM = time.time() - t
     torch.save(best_LSTM,'best_model_LSTM.pth')
@@ -127,7 +128,7 @@ if __name__ == "__main__":
     best_GRU, train_loss_GRU, valid_loss_GRU, words_acc_val_GRU, letters_acc_val_GRU = train_CRNN(train_loader, model_GRU, batch_size, 
                                                                         criterion, optimizer_GRU, num_epochs, valid_loader, 
                                                                         train_label_len, train_input_len, valid_label_len, 
-                                                                        valid_input_len, max_str_len, device)
+                                                                        valid_input_len, max_str_len, device,n_valid_batch)
     
     time_GRU = time.time() - t
     torch.save(best_GRU,'best_model_GRU.pth')
@@ -184,5 +185,5 @@ if __name__ == "__main__":
         "GRU" : [time_GRU, 100*test_accuracy_words_GRU, 100*test_accuracy_letters_GRU, 100*mispred_prop_letters_GRU]
     })
     
-    summary.index = ["Time of training (s)","Word accuracy (%)", "Letter accuracy (%)","(%) of letters in a mispredicted word ({%})"]
+    summary.index = ["Time of training (s)","Word accuracy (%)", "Letter accuracy (%)","(%) of letters in a mispredicted word"]
     print(summary)

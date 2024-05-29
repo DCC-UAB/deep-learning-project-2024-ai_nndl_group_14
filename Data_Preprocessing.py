@@ -201,7 +201,7 @@ def label_to_num(label,alphabet):
 
     Returns
     -------
-    num : np.array - Coded label
+    num : np.array - Encoded label
 
     """
     # We initialize the output vector
@@ -238,7 +238,7 @@ def num_to_label(num,alphabet):
 
 def preprocess_labels(data,size,max_str_len,alphabet):
     """
-    Encode the labels of the gicen data into vectors
+    Encode the labels of the given data into vectors
 
     Parameters
     ----------
@@ -376,6 +376,7 @@ def data_preprocessing(path_csv,path_images,train_size,valid_size,test_size,batc
     return train, valid, test, train_loader, valid_loader, test_loader
 
 if __name__ == "__main__": 
+    # Paths to change in case the files are in another place
     path_zip = '/home/Test Machine'
     destination = '/home/xnmaster/github-classroom/DCC-UAB/deep-learning-project-2024-ai_nndl_group_14/Inputs/'
     print("Extraction of the ZIP files...")

@@ -2,15 +2,11 @@ import torch
 import numpy as np
 import matplotlib.pyplot as plt
 
-from TEST_train import decode
-from TEST_Data_Preprocessing import num_to_label, preprocess_image
+from train import decode
+from Data_Preprocessing import num_to_label, preprocess_image
 import cv2
 import os
 from collections import Counter
-
-
-#from bottle_neck_handling_model.TEST_missclassifications import *
-
 
 @torch.no_grad()  # prevent this function from computing gradients
 def test_CRNN(criterion, model, loader, batch_size, test_label_len, test_input_len, max_str_len, device, alphabet):
@@ -109,11 +105,9 @@ def test_CRNN(criterion, model, loader, batch_size, test_label_len, test_input_l
     accuracy_letters = correct_letters / n_letters
     mispred_prop_letters = mispred_prop_letters/mispred_nb_letters
     
-    # Now display the top errors per letter
+    # Display the top errors per letter
     display_common_misclassifications(letter_misclassifications,alphabet)
     display_top_letter_errors(letter_misclassifications, alphabet, top_n=3)
-
-    
 
     return test_loss, accuracy_words, accuracy_letters, n_letters, mispred_prop_letters, mispred_images, mispred_pred,mispred_target
 
@@ -154,7 +148,7 @@ def plot_misclassified(mispred_images, mispred_pred,mispred_target,alphabet,save
     
 def test_some_images(model, batch_size, loader, max_str_len, alphabet, device, save_path, name):
     """
-    Print somes images, with their label and the prediction of the model.
+    Print some images, with their label and the prediction of the model.
     
     Parameters
     ----------
@@ -162,7 +156,7 @@ def test_some_images(model, batch_size, loader, max_str_len, alphabet, device, s
     batch_size : Int - Size of a batch
     loader : Dataloader - Test values
     max_str_len : Int - Maximum length of a label
-    alphabet : String - Alphabet sed for decoding
+    alphabet : String - Alphabet used for decoding
     device : torch.device - GPU or CPU
     save_path : String - Path of the folder to save the plot
     name : Name of the plot
@@ -170,9 +164,11 @@ def test_some_images(model, batch_size, loader, max_str_len, alphabet, device, s
     if not os.path.exists(save_path):
         os.makedirs(save_path)
      
+    # Get the data
     data, targets = next(iter(loader))
     data, targets = data.to(device), targets.to(device)
     
+    # Apply the model
     h, c = model.init_hidden(128)
     h = h.to(device)
     if c is not None:
@@ -180,12 +176,13 @@ def test_some_images(model, batch_size, loader, max_str_len, alphabet, device, s
         
     output, h, c = model(data,h,c)
 
+    # Define the predicted labels
     _,predictions = torch.max(output.data,dim=2)
     predictions = decode(predictions,batch_size,max_str_len)
     targets = targets.cpu().numpy()
       
     plt.figure(figsize=(16, 6))
-
+    # Plot 6 images, with the true label and the prediction
     for i in range(6):
         plt.subplot(2, 3, i + 1)
         image = data[i].cpu().numpy().reshape((256,64))
@@ -203,7 +200,65 @@ def test_some_images(model, batch_size, loader, max_str_len, alphabet, device, s
     plt.savefig(os.path.join(save_path,name))
     plt.clf()
         
-def test_own_image(model,dir,names,targets,alphabet,max_str_len,device, save_path,save_name):
+def test_own_image(model,dir,names,alphabet,max_str_len,device,save_path, save_name, print_pred:bool = False):
+    """
+    Apply the model on 3 images made by ourselves.
+    
+    Parameters 
+    ----------
+    model : CRNN - Model to apply
+    dir : String - Path of the images
+    names : List - Names of the files
+    alphabet : String - Alphabet used for decoding
+    max_str_len : Int - Maximum label length
+    device : torch.device - GPU or CPU
+    save_path : String - Folder to save the plot
+    save_name : String - Name of the plot
+    print_pred : Boolean - Option to print the results of the predictions
+    """
+    k=0
+    for name in names:
+        # Get the image
+        path = os.path.join(dir,name)
+        image = cv2.imread(path, cv2.IMREAD_GRAYSCALE)
+        # Process the image
+        resized_image = cv2.resize(image, (256, 71))
+        ret, otsu_thresholded = cv2.threshold(resized_image, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+        image = preprocess(otsu_thresholded)/255.
+        image = image.astype(np.float32)
+        
+        # Apply the model
+        h, c = model.init_hidden(1)
+        h = h.to(device)
+        if c is not None:
+            c = c.to(device)
+            
+        input = torch.tensor(image)
+        input = input.reshape((1, 1, input.shape[0], input.shape[1]))
+        input = input.to(device)
+            
+        pred, h, c = model(input,h,c)
+
+        # Make the prediction
+        _, pred = torch.max(pred,dim=2)
+        pred = decode(pred,1,max_str_len)
+        pred = num_to_label(pred[0])
+        
+        # Plot the result
+        plt.subplot(1, 3, k+1)
+        plt.imshow(cv2.rotate(image, cv2.ROTATE_90_COUNTERCLOCKWISE), cmap = 'gray')
+        plt.title(pred, fontsize=12)
+        plt.axis('off')
+        k+=1
+        if print_pred == True:
+            print(f'For the image in {image_path} the prediction is {pred}.')
+            print('--------------------------------------------------------')
+    
+    plt.subplots_adjust(wspace=0.2, hspace=-0.8)
+    plt.savefig(os.path.join(save_path,save_name))
+    plt.clf()
+        
+def last_test_own_image(model,dir,names,targets,alphabet,max_str_len,device, save_path,save_name):
     """
     Apply the model on 3 images made by ourselves.
     
@@ -218,28 +273,33 @@ def test_own_image(model,dir,names,targets,alphabet,max_str_len,device, save_pat
     """
     k=0
     for name in names:
+        # Get the image
         path = os.path.join(dir,name)
         image = cv2.imread(path, cv2.IMREAD_GRAYSCALE)
+        # Process it
         image = preprocess_image(image)
         image = image/255.
         image = image.astype(np.float32)
         
+        # Apply the model
         h, c = model.init_hidden(1)
         h = h.to(device)
         if c is not None:
             c = c.to(device)
-            
+        
         input = torch.tensor(image)
         input = input.reshape((1, 1, input.shape[0], input.shape[1]))
         input = input.to(device)
         
         pred, h, c = model(input,h,c)
         
+        # Compute the prediction
         _, pred = torch.max(pred,dim=2)
         pred = decode(pred,1,max_str_len)
         
         pred = num_to_label(pred[0],alphabet)
         
+        # Plot the result
         plt.subplot(1, 3, k+1)
         plt.imshow(cv2.rotate(image, cv2.ROTATE_90_COUNTERCLOCKWISE), cmap = 'gray')
         plt.title(targets[k]+"/"+pred, fontsize=12)
