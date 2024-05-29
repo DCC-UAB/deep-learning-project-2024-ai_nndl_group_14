@@ -82,7 +82,7 @@ if __name__ == "__main__":
     ## Number of neurons of the RNN layers
     rnn_hidden_dim = 512
     ## Number of RNN layers
-    n_rnn_layers = 2
+    n_rnn_layers = 1
     ## Dimension of the output
     output_dim = num_of_characters
     ## Drop rate
@@ -94,8 +94,8 @@ if __name__ == "__main__":
     model_LSTM = CRNN(rnn_input_dim, rnn_hidden_dim, n_rnn_layers, output_dim, drop_prob, "LSTM").to(device)
     model_GRU = CRNN(rnn_input_dim, rnn_hidden_dim, n_rnn_layers, output_dim, drop_prob, "GRU").to(device)
     # Optimizer
-    optimizer_LSTM = optim.Adam(model_LSTM.parameters(), lr=0.002, weight_decay=0.002)
-    optimizer_GRU = optim.Adam(model_GRU.parameters(), lr=0.002, weight_decay=0.002)
+    optimizer_LSTM = optim.Adam(model_LSTM.parameters(), lr=0.001, weight_decay=0.001)
+    optimizer_GRU = optim.Adam(model_GRU.parameters(), lr=0.001, weight_decay=0.001)
     print("Models successfully created.")
     print(f"--> LSTM : {get_n_params(model_LSTM)} parameters")
     print(f"--> GRU : {get_n_params(model_GRU)} parameters")
