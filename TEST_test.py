@@ -100,6 +100,8 @@ def test_CRNN(criterion, model, loader, batch_size, test_label_len, test_input_l
         
         # Carry out the misclassification analysis
         batch_misclassifications = analyze_misclassifications(pred, target)
+
+        # update letter_misclassifications counter with the missclassified pairs of all the batches
         letter_misclassifications.update(batch_misclassifications)
         
     # Average loss over each batch (25 batches in the test set) 
@@ -110,7 +112,7 @@ def test_CRNN(criterion, model, loader, batch_size, test_label_len, test_input_l
     mispred_prop_letters = mispred_prop_letters/mispred_nb_letters
     
     # Now display the top errors per letter
-    display_common_misclassifications(letter_misclassifications,alphabet)
+    display_common_misclassifications(letter_misclassifications, alphabet)
     display_top_letter_errors(letter_misclassifications, alphabet, top_n=3)
 
     
@@ -249,24 +251,47 @@ def test_own_image(model,dir,names,targets,alphabet,max_str_len,device, save_pat
     plt.subplots_adjust(wspace=0.2, hspace=-0.8)
     plt.savefig(os.path.join(save_path,save_name))
     plt.clf()
-    
+
+
+
+
+
 def analyze_misclassifications(predictions, true_labels):
+    """
+    comment: char or letter means the integer returned by the decoder than is then transformed 
+    to the actual 'char' or 'letter' based on the alphabet
+    """
+
     letter_misclassifications = Counter()
 
+    # iterate over the the batch sequences from the decoded predictions and targets
     for pred_seq, true_seq in zip(predictions, true_labels):
-        pred_seq = [p for p in pred_seq if p != -1]
+        pred_seq = [p for p in pred_seq if p != -1] # don't append placeholders indicating unfilled positions (-1)
         true_seq = [t for t in true_seq if t != -1]
 
+        # iterate over the letters of the given sequence
         for pred_char, true_char in zip(pred_seq, true_seq):
             if pred_char != true_char:
-                letter_misclassifications[(true_char, pred_char)] += 1
 
+                # add to the counter class both the true letter and the predicted letter and add +1 to the counter.
+                letter_misclassifications[(true_char, pred_char)] += 1 
+    
+    # return the counter of all the misclasified pair in the given batch
     return letter_misclassifications
 
 def display_common_misclassifications(misclassifications, alphabet,top_n=10):
+    """
+    comment: char or letter means the integer returned by the decoder than is then transformed 
+    to the actual 'char' or 'letter' based on the alphabet
+    """
+
     print("Top Misclassifications:")
+
+    # iterate over the top n pairs with more counts from the whole data
     for (true_char, pred_char), count in misclassifications.most_common(top_n):
-        true_display = alphabet[true_char] if true_char < len(alphabet) else f"Unknown: {true_char}"
+
+        # display the integers of the predictions and targets depending on the position in the alphabet
+        true_display = alphabet[true_char] if true_char < len(alphabet) else f"Unknown: {true_char}" # unknown if not in the alphabet
         pred_display = alphabet[pred_char] if pred_char < len(alphabet) else f"Unknown: {pred_char}"
         print(f"True: '{true_display}', Predicted: '{pred_display}', Count: {count}")
 
@@ -274,27 +299,36 @@ def display_common_misclassifications(misclassifications, alphabet,top_n=10):
 
 def display_top_letter_errors(letter_misclassifications, alphabet, top_n=8):
     """
-    Displays the top mispredicted letters for each letter.
-
-    Parameters:
-    - letter_misclassifications (Counter): Counter of misclassified letter pairs
-    - top_n (int): Number of top mispredictions to display for each letter
+    comment: char or letter means the integer returned by the decoder than is then transformed 
+    to the actual 'char' or 'letter' based on the alphabet
     """
     # Create a dictionary to hold data organized by true letter
     organized_misclassifications = {}
 
-    # Organize misclassifications by true letter
+    # iterate over the pairs of letters in the counter
     for (true_letter, pred_letter), count in letter_misclassifications.items():
+
+        #add to the dictionary the true letter if is not in it   
         if true_letter not in organized_misclassifications:
             organized_misclassifications[true_letter] = []
+
+        #append for each letter (key in the dictionary) the predicted letter and the count of the pair
         organized_misclassifications[true_letter].append((pred_letter, count))
 
-    # Sort and display the results
+
+    # iterate through the keys of the dictionary
     for true_letter in sorted(organized_misclassifications.keys()):
+
         mispredictions = organized_misclassifications[true_letter]
-        mispredictions.sort(key=lambda x: x[1], reverse=True)  # Sort by count, descending
+
+        # Sort by count the given key in descending order
+        mispredictions.sort(key=lambda x: x[1], reverse=True)
+
+        # display the integers of the targets depending on the position in the alphabet 
         true_display = alphabet[true_letter] if true_letter < len(alphabet) else f"Unknown: {true_letter}"
         print(f"Top mispredictions for '{true_display}':")
+
+        # display the top_n counts of integers of the predictions depending on the position in the alphabet 
         for pred_letter, count in mispredictions[:top_n]:
             pred_display = alphabet[pred_letter] if pred_letter < len(alphabet) else f"Unknown: {pred_letter}"
             print(f"  Predicted: '{pred_display}', Count: {count}")
