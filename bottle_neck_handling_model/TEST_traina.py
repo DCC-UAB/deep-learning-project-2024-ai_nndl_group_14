@@ -111,8 +111,8 @@ def validate_CRNN(criterion, model, loader, batch_size, valid_label_len, valid_i
         n_letters += np.sum(target!=-1)
 
 
-        batch_misclassifications = analyze_misclassifications(pred, target)
-        letter_misclassifications.update(batch_misclassifications)
+        #batch_misclassifications = analyze_misclassifications(pred, target)
+        #letter_misclassifications.update(batch_misclassifications)
     
     # Average loss over each batch (25 batches in the validation set)
     val_loss /= 25
@@ -120,7 +120,7 @@ def validate_CRNN(criterion, model, loader, batch_size, valid_label_len, valid_i
     accuracy_words = correct_words / len(loader.dataset)
     accuracy_letters = correct_letters / n_letters
     
-    return val_loss, accuracy_words, accuracy_letters, letter_misclassifications
+    return val_loss, accuracy_words, accuracy_letters #, letter_misclassifications
 
 def train_CRNN(dataloader, model, batch_size, criterion, optimizer, num_epochs, valid_loader, train_label_len, train_input_len, valid_label_len, valid_input_len, max_str_len, device):
     """
@@ -196,7 +196,7 @@ def train_CRNN(dataloader, model, batch_size, criterion, optimizer, num_epochs, 
                 print({ 'batch': batch, 'epoch': epoch, 'training loss': loss.item()})
         
         # Application of the model on the validation set
-        val_loss, accuracy_words, accuracy_letters, letter_misclassifications = validate_CRNN(criterion, model, valid_loader, batch_size, valid_label_len, valid_input_len, max_str_len, device)
+        val_loss, accuracy_words, accuracy_letters = validate_CRNN(criterion, model, valid_loader, batch_size, valid_label_len, valid_input_len, max_str_len, device)
         
         if val_loss < best_validation_loss:
             best_model = model.state_dict().copy()
