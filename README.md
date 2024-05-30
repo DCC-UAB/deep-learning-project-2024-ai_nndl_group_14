@@ -74,7 +74,7 @@ Andreu Gascón (1670919@uab.cat)
 
 Mathias Lommel (Mathias.Lommel@autonoma.cat / mathias.lommel@insa-rennes.fr) 
 
-Pere Mayol 
+Pere Mayol (1669503@uab.cat / peremayolc@gmail.com)
 
 ---------------------------------------
 
