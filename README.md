@@ -81,8 +81,10 @@ python main.py
 
 
 ## Contributors
-Write here the name and UAB mail of the group members
+Andreu Gascón 
+Mathias Lommel (Mathias.Lommel@autonoma.cat / mathias.lommel@insa-rennes.fr)
+Pere Mayol
 
-Xarxes Neuronals i Aprenentatge Profund
-Grau de __Write here the name of your estudies (Artificial Intelligence, Data Engineering or Computational Mathematics & Data analyitics)__, 
+Neural Networks and Deep Learning
+Degree of __Artificial Intelligence__, 
 UAB, 2023
