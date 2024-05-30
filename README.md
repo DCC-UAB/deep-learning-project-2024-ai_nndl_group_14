@@ -87,6 +87,8 @@ Mathias Lommel (Mathias.Lommel@autonoma.cat / mathias.lommel@insa-rennes.fr)
 
 Pere Mayol
 
+---------------------------------------
+
 Neural Networks and Deep Learning
 
 Degree of __Artificial Intelligence__, 
