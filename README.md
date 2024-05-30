@@ -30,6 +30,14 @@ For the training of those models, we used those parameters :
 - Learning rate of 0.001
 - 10 epochs
 
+Afterwards, we wanted to see if by training a bigger number of samples in the training and validation images. So for the final model we took 300800 as the train size and 30080 as the validation size. This allowed us to ... 
+
+For the training of the final model, we used these parameters :
+- Size of the training sammple : 300 800 images
+- Size of the validation sample : 30 080 images
+- 10 epochs
+
+
 ## 4 - Test of the models
 
 In this part, we have applied the models implemented on the test dataset. We obtain acceptable results since the Letter Accuracy is around 80%, and the Word Accuracy, around 60%.  
