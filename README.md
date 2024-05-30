@@ -64,6 +64,8 @@ Then, simply running the main.py file will carry out the pre-processing operatio
 This run will print some information in the terminal, such as the number of parameters of each model, the results of the training/test; as well as some plots (that will be stored in a folder "Plots"). At the end, we also print a comparative table of both models.
 Again, some paths may need changes : "path_csv", which has to be the location of the 3 .csv files / "path_images", which has to be the location of the extracted folders (="destination") / and "save_plots", which corresponds to the place where we will save the plots during the training.
 
+By running main.py, all the plots done will be found in the folder "Plots". For the long training, all the results are stored in the folder "Long Training Results" (plots and terminal results as well).
+
 
 ## Example Code
 The given code is a simple CNN example training on the MNIST dataset. It shows how to set up the [Weights & Biases](https://wandb.ai/site)  package to monitor how your network is learning, or not.
