@@ -92,4 +92,4 @@ Neural Networks and Deep Learning
 
 Degree of __Artificial Intelligence__
 
-UAB, 2023
+UAB, 2023-2024
