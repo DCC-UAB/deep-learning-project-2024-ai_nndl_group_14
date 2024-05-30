@@ -49,8 +49,8 @@ if __name__ == "__main__":
     path_images = '/home/xnmaster/github-classroom/DCC-UAB/deep-learning-project-2024-ai_nndl_group_14/Inputs/'
     
     # Sizes of the datasets
-    train_size =  300800
-    valid_size = 30080
+    train_size =  64000
+    valid_size = 6400
     test_size = valid_size
     batch_size = 128
     n_valid_batch = valid_size / batch_size
