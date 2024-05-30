@@ -11,41 +11,43 @@ After this cleaning operation, we converted the labels into vectors. To do that,
 We decided to put this special value apart, and consider a maximum length of 24. Now, each label can be converted into a vector of size 24, with numbers corresponding to the characters of the word (and with a padding value of -1 for shorter words). For this convertion, we used 30 different characters : " ABCDEFGHIJKLMNOPQRSTUVWXYZ-'" (+1 for the CTC pseudo blank).
 
 ## 3 - Models
-Considering the model, we have implemented 3 models : 
-  -  [CRNN model using LSTM](https://github.com/DCC-UAB/deep-learning-project-2024-ai_nndl_group_14/blob/main/best_model_LSTM.pth)
-  -  [CRNN model using GRU](https://github.com/DCC-UAB/deep-learning-project-2024-ai_nndl_group_14/blob/main/best_model_GRU.pth)
-  -  ...
+Considering the model, we have implemented 1 model, with 2 versions : 
+  -  CRNN model using LSTM
+  -  CRNN model using GRU
 
-For the Convolutional and Recurrent Neural Networks, we first apply 3 convolutional layers with 3x3 filters, ReLU activation, same padding, and batch normalization, followed by a linear layer, with ReLU activation, in order to obtain a final activation map of 64x64. This map will then pass through 2 LSTM bi-directional recurrent layers, of 512 neurons. 
+For each Convolutional and Recurrent Neural Networks, we first apply 3 convolutional layers with 3x3 filters, ReLU activation, same padding, and batch normalization, followed by a linear layer, with ReLU activation, in order to obtain a final activation map of 64x64. This map will then pass through 2 LSTM bi-directional recurrent layers, of 512 neurons. 
 The final activation map obtained has a size 64x1024, which leads to an output of shape 64x30, by applying a linear transformation, and a Log-Softmax.
 
 The final map is finally compared to the label using the CTC Loss. Here, the 64x30 output corresponds to 64 probability distributions (over the 30 possible characters). Using those probability distributions, we can obtain a predicted word. For example, with the label 'DIMOS', considering the maximum probability character for each line, one could obtain 'DDDDDDDDD_IIIII_MMMMMMMMMM_OOOO_SSSS______' (vector of size 64, '_' being the blank symbol), which leads to 'DIMOS' after the collapse operation.
 
 For the training of those models, we used those parameters :
-- Size of the training sammple : 64 000 images
+- Size of the training sample : 64 0000 images
 - Size of the validation sample : 6 400 images
 - Batch size of 128
 - Adam optimizer
-- Drop rate of 0.3 on the 2 last convolutional layers, and the recurrent ones
+- Drop rate of 0.4 on the 2 last convolutional layers, and the recurrent ones
 - Learning rate of 0.001
 - 10 epochs
 
+Afterwards, we wanted to see if by training a bigger number of samples in the training and validation images. So for the final model we took 300800 as the train size and 30080 as the validation size. This allowed us to obtain better results (that we will see in the test part of the models). 
+
+For the training of the final model, we used these parameters :
+- Size of the training sammple : 300 800 images
+- Size of the validation sample : 30 080 images
+- 10 epochs
+
+
 ## 4 - Test of the models
 
-In this part, we have applied the models implemented on the test dataset. We obtain acceptable results since the Letter Accuracy is around 80%, and the Word Accuracy, around 60%.  
+In this part, we have applied the models implemented on the test dataset. With the first training, we obtain acceptable results since the Letter Accuracy is around 80%, and the Word Accuracy, around 60%. But, we can easily see the improvement when using more data. In fact, with the second training, we increase those accuracies to 82% accuracy for the words, and 92% for the letters, which is a really good improvement. 
 
-In that part, we also did some particular tests, such as ploting at some predictions with its image, looking at mispredicted images, to indentify any recurrent aspect of those images.
-We also looked at the top-3 most mispredicted letters, and their top mispredicted letters. In this part, we observe that with LSTM neurons, 'L' is often predicted as 'E' or 'I', and the same goes with 'N' ann 'E'. For the model with GRU neurons, we find again the 'L' often predicted as 'E', 'N' as 'E', and 'E' as 'R'.
+In that part, we also did some particular tests, such as ploting some predictions with its image, or looking at mispredicted images to indentify any recurrent aspect of those images.
+We also looked at the top-3 most mispredicted letters, and their top predicted letters mistakes. In this part, we observe that, for both versions, 'H' is often predicted as 'M', 'N' often predicted as 'M' and the same goes with 'O' and 'U'. 
 What we can see here is that, in most of the cases, the model mispredict a letter for a letter having some shape similarities.
 
-At the end, we also applied the models on own written images. All the code on this can be found in the following folder -> [Trying with our own images](https://github.com/DCC-UAB/deep-learning-project-2024-ai_nndl_group_14/tree/main/IMAGES_EXTRA), where you will be able to find:
-- [NOTEBOOK](https://github.com/DCC-UAB/deep-learning-project-2024-ai_nndl_group_14/blob/main/IMAGES_EXTRA/Project_NN_v6_WORKSWELL_NAMETRIAL.ipynb) where we train the model and then make predictions based on the new images. The accuracy shown in this file is similar to the one mentioned before.
-- [PYTHON FILE](https://github.com/DCC-UAB/deep-learning-project-2024-ai_nndl_group_14/blob/main/IMAGES_EXTRA/function_new_images.py) which just contains the function used to make the predictions for images, it can also be found in the notebook.
-- IMAGES USED, three images which contain our names, to test it on them.
-- [RESULTING IMAGE](https://github.com/DCC-UAB/deep-learning-project-2024-ai_nndl_group_14/blob/main/IMAGES_EXTRA/FINAL.png), shows the image where we compare the photos amd the predictions done by our model thorugh the function.
+At the end, we also applied the models on own written images. To do so, we have written our names on a paper, and applied the model on them. We encountered some problems regarding the format of the images and their sizes. This is because in the dataset our model was trained on, all images have a similar shape (around 256x80) and colour (binarized images). To fix this changes and make our predictions good, we used the functions inside the cv2 library, which allow us to binarize them and resize them in a way that the predictions could be done. This happened because we saw poor performance for images that had very large sizes and also that where taken in poor light and not preprocessed as they should be. After improving this, we were able to get very good predictions, taking into account the necessities of the function, eventhough in some cases there are still errors, since the accuracy is not 100%, so it can fail for some letters but mostly if they are cleary written, it will perform fairly good. 
 
-To do so, we have written our names on a paper, and applied the model on them. We encountered some problems regarding the format of the images and their sizes. This is because in the dataset our model was trained on, all images are of a similar shape and colour (binarized images). To fix this changes and make our predictions good, we used the functions inside the cv2 library, which allow us to binarize them and resize them in a way that the predictions could be done. This happened because we saw poor performance for images that had very large sizes and also that where taken in pour light and not preprocessed as they should be. After improving this, we were able to get very good predictions, taking into account the necessities of the function, eventhough in some cases there are still errors, since the accuracy is not 100%, so it can fail for some letters but mostly if they are cleary written, it will perform fairly good. The model used on this is the same as in the notebook [Project_NN_v6_WORKSWELL.ipynb](https://github.com/DCC-UAB/deep-learning-project-2024-ai_nndl_group_14/blob/main/notebooks/Project_NN_v6_WORKSWELL.ipynb), which does very good in terms of performance, but has smaller train and validation sizes.
-
+We tried this with an early model with smaller sizes for training and validation, around 30000 and 3000, where the predictions are good. Some letter predictions missed, still the accuracy was fairly good. Afterwards, we tried it with the final model, where we took in all images for training, and 
 
 
 ## Code structure
@@ -79,8 +81,16 @@ python main.py
 
 
 ## Contributors
-Write here the name and UAB mail of the group members
+Andreu Gascón 
 
-Xarxes Neuronals i Aprenentatge Profund
-Grau de __Write here the name of your estudies (Artificial Intelligence, Data Engineering or Computational Mathematics & Data analyitics)__, 
+Mathias Lommel (Mathias.Lommel@autonoma.cat / mathias.lommel@insa-rennes.fr) 
+
+Pere Mayol
+
+---------------------------------------
+
+Neural Networks and Deep Learning
+
+Degree of __Artificial Intelligence__, 
+
 UAB, 2023
