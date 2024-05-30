@@ -7,7 +7,7 @@ from TEST_Data_Preprocessing import num_to_label, preprocess_image
 import cv2
 import os
 from collections import Counter
-import editdistance
+
 
 #from bottle_neck_handling_model.TEST_missclassifications import *
 
@@ -39,7 +39,6 @@ def test_CRNN(criterion, model, loader, batch_size, test_label_len, test_input_l
     mispred_images : array - Misclassified images
     mispred_pred : array - Their predicted labels 
     mispred_target : array - Their true labels 
-    avg_levenshtein_distance : Float - The average Levenshtein distance over the test set
     """
     
     # Initialisations
@@ -51,9 +50,6 @@ def test_CRNN(criterion, model, loader, batch_size, test_label_len, test_input_l
     mispred_prop_letters = 0
     mispred_nb_letters = 0
     letter_misclassifications = Counter()
-    
-    total_distance = 0  # For Levenshtein distance calculation
-    total_sequences = 0  # For Levenshtein distance calculation
 
     # Gradients are not needed
     model.eval()
@@ -102,14 +98,6 @@ def test_CRNN(criterion, model, loader, batch_size, test_label_len, test_input_l
         
         n_letters += np.sum(target!=-1)
         
-        # Calculate Levenshtein distance for each sequence pair
-        for pred_seq, target_seq in zip(pred, target):
-            pred_str = num_to_label(pred_seq, alphabet)
-            target_str = num_to_label(target_seq, alphabet)
-            
-            total_distance += editdistance.eval(pred_str, target_str)
-            total_sequences += 1
-        
         # Carry out the misclassification analysis
         batch_misclassifications = analyze_misclassifications(pred, target)
 
@@ -123,15 +111,13 @@ def test_CRNN(criterion, model, loader, batch_size, test_label_len, test_input_l
     accuracy_letters = correct_letters / n_letters
     mispred_prop_letters = mispred_prop_letters/mispred_nb_letters
     
-    # Calculate the average Levenshtein distance
-    avg_levenshtein_distance = total_distance / total_sequences
-    
     # Now display the top errors per letter
     display_common_misclassifications(letter_misclassifications, alphabet)
     display_top_letter_errors(letter_misclassifications, alphabet, top_n=3)
-    
-    return test_loss, accuracy_words, accuracy_letters, n_letters, mispred_prop_letters, mispred_images, mispred_pred, mispred_target, avg_levenshtein_distance
 
+    
+
+    return test_loss, accuracy_words, accuracy_letters, n_letters, mispred_prop_letters, mispred_images, mispred_pred,mispred_target
 
 
 def plot_misclassified(mispred_images, mispred_pred,mispred_target,alphabet,save_path,name):
