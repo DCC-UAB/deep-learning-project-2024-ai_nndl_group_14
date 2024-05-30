@@ -82,9 +82,13 @@ python main.py
 
 ## Contributors
 Andreu Gascón 
-Mathias Lommel (Mathias.Lommel@autonoma.cat / mathias.lommel@insa-rennes.fr)
+
+Mathias Lommel (Mathias.Lommel@autonoma.cat / mathias.lommel@insa-rennes.fr) 
+
 Pere Mayol
 
 Neural Networks and Deep Learning
+
 Degree of __Artificial Intelligence__, 
+
 UAB, 2023
