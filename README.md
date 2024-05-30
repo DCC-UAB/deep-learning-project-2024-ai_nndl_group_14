@@ -80,6 +80,6 @@ Pere Mayol
 
 Neural Networks and Deep Learning
 
-Degree of __Artificial Intelligence__, 
+Degree of __Artificial Intelligence__
 
 UAB, 2023
