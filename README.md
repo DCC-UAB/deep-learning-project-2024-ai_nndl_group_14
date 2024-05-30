@@ -75,7 +75,7 @@ This run will print some information in the terminal, such as the number of para
 
 Again, some paths may need changes : "path_csv", which has to be the location of the 3 .csv files / "path_images", which has to be the location of the extracted folders (="destination") / and "save_plots", which corresponds to the place where we will save the plots during the training.
 
-Note that for the long training, all the results are stored in the folder "Long Training Results" (plots and terminal results as well). Then, the main.py is written to achieve the first training that we presented (64000 images for training and 6400 for validation), which took around 10 minutes to train on the VM that we used.
+Note that for the long training, all the results are stored in the folder "Long Training Results" (plots and terminal results as well). Then, the main.py is written to achieve the first training that we presented (64000 images for training and 6400 for validation), which took around 15 minutes to train on the VM that we used.
 
 As a consequence, the plots and images stored in the "Plots" folder corresponds to the results of this first training. In this folder, one can also find a .txt file containing the terminal results of our last run of this model.
 
