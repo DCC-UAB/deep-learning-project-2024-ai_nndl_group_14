@@ -254,7 +254,7 @@ def test_own_image(model,dir,names,alphabet,max_str_len,device, save_path,save_n
         plt.axis('off')
         k+=1
         if print_pred == True:
-            print(f'For the image in {path} the prediction is {pred}.')
+            print(f'For the image {name}, the prediction is {pred}.')
             print('--------------------------------------------------------')
     
     plt.subplots_adjust(wspace=0.2, hspace=-0.8)
