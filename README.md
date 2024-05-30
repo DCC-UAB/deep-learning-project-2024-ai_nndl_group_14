@@ -45,7 +45,9 @@ In that part, we also did some particular tests, such as ploting some prediction
 We also looked at the top-3 most mispredicted letters, and their top predicted letters mistakes. In this part, we observe that, for both versions, 'H' is often predicted as 'M', 'N' often predicted as 'M' and the same goes with 'O' and 'U'. 
 What we can see here is that, in most of the cases, the model mispredict a letter for a letter having some shape similarities.
 
-At the end, we also applied the models on own written images. To do so, we have written our names on a paper, and applied the model on them. We encountered some problems regarding the format of the images and their sizes. This is because in the dataset our model was trained on, all images have a similar shape (around 256x80) and colour (binarized images). To fix this changes and make our predictions good, we used the functions inside the cv2 library, which allow us to binarize them and resize them in a way that the predictions could be done. This happened because we saw poor performance for images that had very large sizes and also that where taken in poor light and not preprocessed as they should be. After improving this, we were able to get very good predictions, taking into account the necessities of the function, eventhough in some cases there are still errors, since the accuracy is not 100%, so it can fail for some letters but mostly if they are cleary written, it will perform fairly good. 
+At the end, we also applied the models on own written images. To do so, we have written our names on a paper, and applied the model on them. We encountered some problems regarding the format of the images and their sizes. This is because in the dataset our model was trained on, all images have a similar shape (around 256x80) and colour (binarized images). 
+To fix this changes and make our predictions good, we used the functions inside the cv2 library, which allow us to binarize them and resize them in a way that the predictions could be done. This happened because we saw poor performance for images that had very large sizes and also that where taken in poor light and not preprocessed as they should be. 
+After improving this, we were able to get very good predictions, taking into account the necessities of the function, eventhough in some cases there are still errors, since the accuracy is not 100%, so it can fail for some letters but mostly if they are cleary written, it will perform fairly good. 
 
 We tried this with an early model with smaller sizes for training and validation, around 30000 and 3000, where the predictions are good. Some letter predictions missed, still the accuracy was fairly good. Afterwards, we tried it with the final model, where we took in almost all the images for training, and we obtain quite similar results, with some letters mispredicted. But again, the overall result is clearly close to the desired one.
 
@@ -58,29 +60,14 @@ The code is composed by different .py files :
 - test.py : containing test and ploting functions
 - main.py : managing all the previous files
 
-To run the code, first, we have to run the Data_Preprocessing.py file. This will extract the .zip files if it's not already done. If it's done, it will not do anything else. The only thing that has to be changed is the paths "path_zip" and "destination", which correspond, respectively, to the location of the .zip files and the place where to put the extracted folder.
+To run the code, first, we have to run the Data_Preprocessing.py file. This will extract the .zip files if it's not already done. If it's done, it will not do anything else. The only thing that has to be changed is the paths "path_zip" and "destination", which correspond, respectively, to the location of the .zip files and the place where to put the extracted folders.
 
 Then, simply running the main.py file will carry out the pre-processing operations, create the models, train and test them. 
 This run will print some information in the terminal, such as the number of parameters of each model, the results of the training/test; as well as some plots (that will be stored in a folder "Plots"). At the end, we also print a comparative table of both models.
+
 Again, some paths may need changes : "path_csv", which has to be the location of the 3 .csv files / "path_images", which has to be the location of the extracted folders (="destination") / and "save_plots", which corresponds to the place where we will save the plots during the training.
 
-By running main.py, all the plots done will be found in the folder "Plots". For the long training, all the results are stored in the folder "Long Training Results" (plots and terminal results as well).
-
-
-## Example Code
-The given code is a simple CNN example training on the MNIST dataset. It shows how to set up the [Weights & Biases](https://wandb.ai/site)  package to monitor how your network is learning, or not.
-
-Before running the code you have to create a local environment with conda and activate it. The provided [environment.yml](https://github.com/DCC-UAB/XNAP-Project/environment.yml) file has all the required dependencies. Run the following command: ``conda env create --file environment.yml `` to create a conda environment with all the required dependencies and then activate it:
-```
-conda activate xnap-example
-```
-
-To run the example code:
-```
-python main.py
-```
-
-
+Note that for the long training, all the results are stored in the folder "Long Training Results" (plots and terminal results as well). Then, the main.py is written to achieve the first training that we presented (64000 images for training and 6400 for validation).
 
 ## Contributors
 Andreu Gascón 
