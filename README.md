@@ -70,11 +70,11 @@ Again, some paths may need changes : "path_csv", which has to be the location of
 Note that for the long training, all the results are stored in the folder "Long Training Results" (plots and terminal results as well). Then, the main.py is written to achieve the first training that we presented (64000 images for training and 6400 for validation).
 
 ## Contributors
-Andreu Gascón 
+Andreu Gascón (1670919@uab.cat)
 
 Mathias Lommel (Mathias.Lommel@autonoma.cat / mathias.lommel@insa-rennes.fr) 
 
-Pere Mayol
+Pere Mayol 
 
 ---------------------------------------
 
