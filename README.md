@@ -12,8 +12,8 @@ We decided to put this special value apart, and consider a maximum length of 24.
 
 ## 3 - Models
 Considering the model, we have implemented 1 model, with 2 versions : 
-  -  CRNN model using LSTM
-  -  CRNN model using GRU
+  -  [CRNN model using LSTM](https://github.com/DCC-UAB/deep-learning-project-2024-ai_nndl_group_14/blob/main/best_model_LSTM.pth)
+  -  [CRNN model using GRU](https://github.com/DCC-UAB/deep-learning-project-2024-ai_nndl_group_14/blob/main/best_model_GRU.pth)
 
 For each Convolutional and Recurrent Neural Networks, we first apply 3 convolutional layers with 3x3 filters, ReLU activation, same padding, and batch normalization, followed by a linear layer, with ReLU activation, in order to obtain a final activation map of 64x64. This map will then pass through 2 LSTM bi-directional recurrent layers, of 512 neurons. 
 The final activation map obtained has a size 64x1024, which leads to an output of shape 64x30, by applying a linear transformation, and a Log-Softmax.
@@ -54,11 +54,11 @@ We tried this with an early model with smaller sizes for training and validation
 
 ## Code structure
 The code is composed by different .py files :
-- Data_Preprocessing.py : containing all the preprocessing functions
-- [models.py](https://github.com/DCC-UAB/deep-learning-project-2024-ai_nndl_group_14/blob/main/models/models.py) : containing the definition of the models
-- train.py : containing training/validation and some ploting functions
-- test.py : containing test and ploting functions
-- main.py : managing all the previous files
+- [Data_Preprocessing.py](https://github.com/DCC-UAB/deep-learning-project-2024-ai_nndl_group_14/blob/main/TEST_Data_Preprocessing.py) : containing all the preprocessing functions
+- [models.py](https://github.com/DCC-UAB/deep-learning-project-2024-ai_nndl_group_14/blob/main/TEST_models.py) : containing the definition of the models
+- [train.py](https://github.com/DCC-UAB/deep-learning-project-2024-ai_nndl_group_14/blob/main/TEST_train.py) : containing training/validation and some ploting functions
+- [test.py](https://github.com/DCC-UAB/deep-learning-project-2024-ai_nndl_group_14/blob/main/TEST_test.py) : containing test and ploting functions
+- [main.py](https://github.com/DCC-UAB/deep-learning-project-2024-ai_nndl_group_14/blob/main/TEST_main.py) : managing all the previous files
 
 To run the code, first, we have to run the Data_Preprocessing.py file. This will extract the .zip files if it's not already done. If it's done, it will not do anything else. The only thing that has to be changed is the paths "path_zip" and "destination", which correspond, respectively, to the location of the .zip files and the place where to put the extracted folders.
 
