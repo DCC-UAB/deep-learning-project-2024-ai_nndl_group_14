@@ -80,7 +80,7 @@ Note that for the long training, all the results are stored in the folder "Long 
 As a consequence, the plots and images stored in the "Plots" folder corresponds to the results of this first training. In this folder, one can also find a .txt file containing the terminal results of our last run of this model.
 
 ## Contributors
-Andreu Gascón (1670919@uab.cat)
+Andreu Gascón (Andreu.Gascon@autonoma.cat / a.gasconmarzo@gmail.com)
 
 Mathias Lommel (Mathias.Lommel@autonoma.cat / mathias.lommel@insa-rennes.fr) 
 
